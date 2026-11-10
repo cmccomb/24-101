@@ -1,0 +1,42 @@
+/* Generated from design/tokens.json. Run npm run tokens. */
+:root {
+  --color-paper: #ffffff;
+  --color-ink: #202124;
+  --color-muted: #565b60;
+  --color-line: #d4d8dc;
+  --color-surface: #f4f5f6;
+  --color-brand: #c41230;
+  --color-reference: #6d6e71;
+  --color-requirement: #043673;
+  --color-heat: #c41230;
+  --color-fluid: #397eac;
+  --color-structure: #8c959d;
+  --color-structure-dark: #3b454e;
+  --color-structure-light: #e0e0e0;
+  --color-storage: #043673;
+  --color-light: #b49a4f;
+  --font-sans: 'Open Sans', Arial, sans-serif;
+  --type-caption: 11px;
+  --type-label: 12px;
+  --type-body: 14px;
+  --type-section: 18px;
+  --type-equation: 24px;
+  --type-claim: clamp(28px, 2.4vw, 38px);
+  --type-identity: 26px;
+  --layout-rail: 224px;
+  --layout-content: 1440px;
+  --layout-rule: 1px;
+  --layout-emphasis: 2px;
+  --layout-radius: 0px;
+  --motion-feedback: 120ms;
+  --motion-standard: 180ms;
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-96: 96px;
+}

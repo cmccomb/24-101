@@ -1,6 +1,6 @@
-import {systems, defaults, fmt} from './systems.js';
-import {lessons, engineering, requirement, perturbation} from './engineering.js';
-import {createViewer} from './models.js';
+import {systems, defaults, fmt} from './systems.js?v=1.2.0';
+import {lessons, engineering, requirement, perturbation} from './engineering.js?v=1.2.0';
+import {createViewer} from './models.js?v=1.2.0';
 
 const $=id=>document.getElementById(id);
 const connections={

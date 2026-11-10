@@ -1,6 +1,6 @@
 # 24-101 · MechE Systems Lab
 
-[Open the lab](https://cmccomb.com/24-101/) · [CMU 24-101](https://www.meche.engineering.cmu.edu/education/courses/24-101.html)
+[Open the lab](https://cmccomb.com/24-101/) · [Design reference](https://cmccomb.com/24-101/design/) · [Design specification](DESIGN.md) · [CMU 24-101](https://www.meche.engineering.cmu.edu/education/courses/24-101.html)
 
 Fourteen mechanical engineering systems organized around engineering claims, explicit system boundaries, conservation laws, parameter studies and editable design requirements. The collection emphasizes thermal and energy systems, begins with the 3D printer and laser cutter, and includes CMU Buggy and an illustrative electric race car.
 
@@ -45,11 +45,17 @@ GitHub Pages deploys the `site/` directory after every push to `main`, following
 | --- | --- |
 | `site/systems.js` | Parameters, SI conversions, calculation models, assumptions, prompts and sources |
 | `site/engineering.js` | Lesson claims, boundaries, conservation accounts, requirements and model-applicability checks |
+| `design/tokens.json` | Shared color, typography, spacing, layout and motion tokens |
+| `site/tokens.css`, `site/theme.js` | Generated CSS and 3D material theme |
+| `site/design/` | Living visual reference with a working specimen using the actual printer model |
 | `site/models.js` | Procedural 3D geometry, animation, orbit controls and labels |
 | `site/app.js` | Controls, results, accounts, charts, requirements, comparison, sharing and CSV export |
 | `site/style.css` | Responsive layout and accessible controls |
 | `tests/physics.test.mjs` | Parameter bounds, conservation, scaling and numerical convergence checks |
 | `tests/engineering.test.mjs` | Conservation accounts, requirement equality and feasibility, input roles and applicability |
+| `tests/design.test.mjs` | Identity, contrast and asset-version checks |
+
+Run `npm run tokens` after editing the design tokens. Tests reject CSS or 3D palettes that drift from the source tokens. Versioned stylesheet and module URLs keep an interface revision from mixing with cached assets from an older revision.
 
 ## Model scope
 

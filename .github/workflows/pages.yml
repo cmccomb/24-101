@@ -29,7 +29,9 @@ jobs:
           node --check site/models.js
           node --check site/systems.js
           node --check site/engineering.js
+          node --check site/design/guide.js
           test -s site/index.html
+          test -s site/tokens.css
           test -s site/vendor/three.module.js
 
   deploy:
