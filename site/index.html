@@ -1,20 +1,59 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>MechE Systems Lab</title><meta name="description" content="Fourteen mechanical engineering systems. Animated 3D models, parametric design, and live physics calculations."><link rel="stylesheet" href="./style.css"><script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script></head>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>24-101 · Mechanical Engineering Systems</title>
+  <meta name="description" content="Define a system boundary. Apply conservation laws. Change a design variable and test a requirement.">
+  <link rel="stylesheet" href="./style.css">
+</head>
 <body>
-<a class="skip" href="#main">Skip to experiment</a>
-<header class="topbar"><a class="brand" href="#printer"><span class="brand-mark">m<span>e</span></span><div>Systems Lab<small>A mechanical engineering field guide</small></div></a><div class="course"><span class="red-dot"></span> CMU MechE <span class="divider">/</span> Introductory physics</div><button id="share" class="quiet">Copy experiment link <span aria-hidden="true">↗</span></button></header>
-<div class="layout">
-<aside class="sidebar" aria-label="System library"><div class="sidebar-heading"><span>THE SYSTEMS</span><span>14</span></div><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Find a system…" aria-label="Find a system"></label><nav id="system-list"></nav><div class="sidebar-foot"><span class="little-orbit">◎</span><p>One machine.<br>Many ways to see the physics.</p></div></aside>
-<main id="main">
-<section class="intro"><div class="eyebrow"><span id="number">01 / 14</span><span class="slash">/</span><span id="category">MAKING</span></div><h1 id="title">3D printer</h1><p id="question" class="question">How fast can heat become a part?</p><p id="description"></p><div id="schedule" hidden></div></section>
-<div class="workspace">
-<section class="visual-panel" aria-label="3D model"><div class="stage-top"><span><i></i> LIVE MODEL</span><span id="energy-tag"></span></div><div id="viewport"><div class="loading" id="loading">Preparing your model…</div><div class="stage-corner">DRAG TO ORBIT · SCROLL TO ZOOM</div></div><div class="stage-controls"><button id="play" aria-label="Pause animation">Ⅱ <span>Pause</span></button><label class="rate">Speed <select id="rate" aria-label="Animation speed"><option value=".25">¼×</option><option value=".5">½×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label><div class="stage-spacer"></div><button id="cutaway" aria-pressed="false">X-ray</button><button id="camera">Reset view</button></div><p class="stage-caption">Schematic 3D geometry · animation uses illustrative time and scale</p></section>
-<section class="inspector"><div class="tabs" role="tablist" aria-label="Explore the system"><button id="tab-design" role="tab" aria-selected="true" aria-controls="panel-design" data-tab="design">Design</button><button id="tab-physics" role="tab" aria-selected="false" aria-controls="panel-physics" data-tab="physics" tabindex="-1">Physics</button><button id="tab-investigate" role="tab" aria-selected="false" aria-controls="panel-investigate" data-tab="investigate" tabindex="-1">Investigate</button></div>
-<div id="panel-design" role="tabpanel" aria-labelledby="tab-design"><div class="panel-title"><h2>Make a change.</h2><button id="reset" class="text-button">Reset inputs</button></div><p class="hint">Adjust a parameter. Watch the machine and the numbers respond.</p><div id="parameters"></div><div class="design-note"><span>↳</span><p>Watch the live results below, or open <b>Physics</b> to see the equations behind them.</p></div></div>
-<div id="panel-physics" role="tabpanel" aria-labelledby="tab-physics" hidden><h2>Follow the physics.</h2><p class="hint" id="physics-topics"></p><div class="physics-connection"><a href="https://coursecatalog.web.cmu.edu/schools-colleges/melloncollegeofscience/departmentofphysics/" target="_blank" rel="noopener">33-141 · PHYSICS I CONNECTION ↗</a><p id="physics-connection"></p></div><div id="equations"></div><details open class="assumptions"><summary>What this model assumes</summary><p id="assumptions"></p></details><div class="cmu"><span>WHERE THIS LEADS AT CMU</span><p id="cmu"></p></div><div class="sources"><h3>Read the source</h3><div id="sources"></div></div></div>
-<div id="panel-investigate" role="tabpanel" aria-labelledby="tab-investigate" hidden><h2>Predict. Change. Explain.</h2><div class="experiment-prompt"><span>TRY THIS</span><p id="prompt"></p></div><label class="note-label" for="prediction">Your prediction</label><textarea id="prediction" rows="3" placeholder="Before moving a slider, what do you expect to happen?"></textarea><label class="note-label" for="observation">Your observation & explanation</label><textarea id="observation" rows="3" placeholder="What changed? Which physical principle explains it?"></textarea><p class="hint">Notes stay in this browser. Export a record to keep your inputs, results and reasoning together.</p><button id="export" class="primary-button">Export experiment ↓</button></div>
-</section></div>
-<section class="results" aria-label="Live calculated results"><div class="section-heading"><div><span class="eyebrow">CALCULATED AS YOU DESIGN</span><h2>What changes?</h2></div><button id="baseline" class="outline-button">Set comparison baseline</button></div><div id="metrics" class="metric-grid" aria-live="polite" aria-atomic="true"></div><p id="model-note" class="model-note"></p></section>
-<section class="sensitivity"><div class="chart-intro"><span class="eyebrow">ONE VARIABLE AT A TIME</span><h2>See the relationship.</h2><p>Sweep one input across its range. All other inputs stay at your current values.</p><label for="sweep-input">Change</label><select id="sweep-input"></select><label for="sweep-output">Measure</label><select id="sweep-output"></select><button id="csv" class="text-button">Download sweep data ↓</button></div><div class="chart-wrap"><div id="chart-title"></div><svg id="chart" viewBox="0 0 740 290" role="img" aria-label="Parameter sensitivity chart"></svg><div class="chart-key"><span class="curve-key"></span> Calculated relationship <span class="point-key"></span> Current design</div></div></section>
-<footer><p>Built for exploration in introductory mechanical engineering.<br>These are transparent teaching models, not validated equipment simulations.</p><p>14 systems · SI-based calculations · Procedural 3D<br><a href="https://www.meche.engineering.cmu.edu/education/courses/24-101.html" target="_blank" rel="noopener">About CMU 24-101 ↗</a></p></footer>
-</main></div><div id="toast" role="status"></div><script type="module" src="./app.js"></script></body></html>
+  <a class="skip" href="#main">Skip to system</a>
+  <header class="site-header">
+    <a class="course-title" href="#printer"><strong>24-101</strong><span>Fundamentals of Mechanical Engineering</span></a>
+    <div class="header-links"><button id="share" class="text-button">Link to this design</button><a href="https://github.com/cmccomb/24-101">Source</a></div>
+  </header>
+  <div class="page">
+    <aside class="sidebar" aria-label="Systems">
+      <h2>Systems</h2><nav id="system-list"></nav>
+    </aside>
+    <main id="main">
+      <header class="lesson-heading">
+        <p class="system-name"><span id="number">01</span><span id="system-name">3D printer</span></p>
+        <h1 id="claim">Faster deposition requires more heating power.</h1>
+        <p id="problem"></p><p id="schedule" hidden></p>
+      </header>
+      <div class="workspace">
+        <figure class="model-figure">
+          <div id="viewport"><div id="loading" class="loading">Loading 3D model.</div></div>
+          <div class="model-tools"><button id="play" aria-label="Pause animation">Pause motion</button><button id="camera">Reset view</button><label><input id="cutaway" type="checkbox"> Transparent</label><span>Drag to rotate · scroll to zoom</span></div>
+          <figcaption>Schematic geometry and motion. Use the calculations for quantitative comparisons.</figcaption>
+        </figure>
+        <section class="inspector" aria-label="Design inputs and physics">
+          <div class="tabs" role="tablist" aria-label="System controls"><button id="tab-inputs" data-tab="inputs" role="tab" aria-selected="true" aria-controls="panel-inputs">Inputs</button><button id="tab-physics" data-tab="physics" role="tab" aria-selected="false" aria-controls="panel-physics" tabindex="-1">Physics</button></div>
+          <div id="panel-inputs" role="tabpanel" aria-labelledby="tab-inputs"><div class="panel-actions"><button id="reset" class="text-button">Restore default inputs</button></div><div id="parameters"></div></div>
+          <div id="panel-physics" role="tabpanel" aria-labelledby="tab-physics" hidden><p class="physics-topics" id="physics-topics"></p><div id="equations"></div><details class="assumptions"><summary>Assumptions and applicability</summary><p id="assumptions"></p></details><div class="course-connection"><h3>Connection to 33-141</h3><p id="physics-connection"></p><a href="https://coursecatalog.web.cmu.edu/schools-colleges/melloncollegeofscience/departmentofphysics/" target="_blank" rel="noopener">Physics course descriptions</a><h3>Later MechE courses</h3><p id="cmu"></p></div><details class="sources"><summary>References</summary><div id="sources"></div></details></div>
+        </section>
+      </div>
+      <section class="results" aria-label="Calculated results">
+        <div class="section-heading"><h2>Calculated response</h2><button id="baseline" class="text-button">Use current inputs as reference</button></div>
+        <div id="metrics" class="metric-grid" aria-live="polite" aria-atomic="true"></div>
+        <p id="reference-inputs" class="reference-inputs"></p><p id="validity" class="validity" hidden></p>
+      </section>
+      <section class="balance-section" aria-label="Conservation account">
+        <div class="section-heading"><h2 id="balance-title">Energy balance</h2><span id="balance-unit"></span></div>
+        <p id="balance-equation" class="balance-equation"></p>
+        <div class="balance-account"><div class="account-side"><h3 id="input-heading">Input</h3><div id="balance-input"></div></div><div class="system-boundary"><span>System boundary</span><p id="boundary"></p></div><div class="account-side"><h3 id="output-heading">Output and accumulation</h3><div id="balance-output"></div></div></div>
+        <p id="residual" class="residual"></p><p id="interpretation" class="interpretation"></p><p id="balance-source" class="balance-source"></p>
+      </section>
+      <section class="analysis" aria-label="Parameter study and design requirement">
+        <div class="parameter-study"><h2>Parameter study</h2><div class="study-controls"><label>Vary <select id="sweep-input"></select></label><label>Measure <select id="sweep-output"></select></label></div><p class="held-fixed">Other inputs are held at their current values.</p><svg id="chart" viewBox="0 0 760 320" role="img" aria-label="Parameter study"></svg><div class="chart-caption"><p id="local-response"></p><button id="csv" class="text-button">Download data (CSV)</button></div></div>
+        <aside class="design-task"><h2>Design requirement</h2><label id="requirement-label" for="requirement-limit"></label><div class="requirement-input"><span id="requirement-relation"></span><input id="requirement-limit" type="number" min="0" step="any" aria-describedby="requirement-context"><span id="requirement-unit"></span></div><p id="requirement-context">An editable requirement for this exercise.</p><p id="requirement-status" role="status"></p><p id="requirement-margin"></p><h3>Test the claim</h3><p id="prompt"></p></aside>
+      </section>
+      <footer><span>Chris McComb · Carnegie Mellon University</span><span>Teaching models. Assumptions and references are in the Physics tab.</span></footer>
+    </main>
+  </div>
+  <div id="toast" role="status"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

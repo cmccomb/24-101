@@ -1,1 +1,1 @@
-{"name":"24-101-systems-lab","version":"1.0.0","private":true,"type":"module","repository":"github:cmccomb/24-101","scripts":{"start":"python3 -m http.server 8765 --directory site","test":"node tests/physics.test.mjs"}}
+{"name":"24-101-systems-lab","version":"1.1.0","private":true,"type":"module","repository":"github:cmccomb/24-101","scripts":{"start":"python3 -m http.server 8765 --directory site","test":"node tests/physics.test.mjs && node tests/engineering.test.mjs"}}

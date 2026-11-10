@@ -2,18 +2,22 @@
 
 [Open the lab](https://cmccomb.com/24-101/) · [CMU 24-101](https://www.meche.engineering.cmu.edu/education/courses/24-101.html)
 
-Fourteen mechanical engineering systems explored through animated procedural 3D models, adjustable design and operating parameters, and live physics calculations. The collection emphasizes thermal and energy systems, begins with the 3D printer and laser cutter, and includes CMU Buggy and an illustrative electric race car.
+Fourteen mechanical engineering systems organized around engineering claims, explicit system boundaries, conservation laws, parameter studies and editable design requirements. The collection emphasizes thermal and energy systems, begins with the 3D printer and laser cutter, and includes CMU Buggy and an illustrative electric race car.
 
 ## Explore
 
-- Orbit, zoom, pause, change animation speed, and inspect transparent geometry.
-- Adjust parameters and see calculated quantities update immediately.
+- Orbit and zoom an orthographic 3D schematic, pause motion, and inspect transparent geometry.
+- Distinguish geometry, design capacities, operating conditions, boundary conditions and model assumptions.
+- Adjust inputs and see calculated quantities update immediately.
+- Account for energy inputs, outputs and accumulation, or driving force, resistance and momentum change.
 - Read equations with numeric substitutions, units, assumptions, source links, and connections to CMU Physics I and subsequent MechE courses.
-- Compare designs against a baseline and sweep one parameter across its range.
-- Record predictions and observations, export experiments as JSON, and download sweep data as CSV.
-- Share a URL that preserves the selected system and its inputs.
+- Compare designs against reference inputs and sweep one parameter across its range.
+- Change an exercise requirement and inspect its margin, shortfall and graph threshold.
+- Distinguish model applicability from meeting a design requirement. Solar tank values at or above 100 °C are marked as extrapolations and cannot be labeled feasible.
+- Download parameter-study data as CSV, including the applicability flag.
+- Share a URL that preserves the system, inputs and exercise requirement.
 
-Notes stay in the browser's local storage. There are no student accounts, analytics or external runtime dependencies. Three.js 0.170.0 and OrbitControls are vendored under their [MIT license](site/vendor/THREE-LICENSE.txt). OrbitControls' import path is adjusted to use the local Three.js module.
+There are no student accounts, analytics or external runtime dependencies. Three.js 0.170.0 and OrbitControls are vendored under their [MIT license](site/vendor/THREE-LICENSE.txt). OrbitControls' import path is adjusted to use the local Three.js module. Open Sans is vendored under the [SIL Open Font License](site/vendor/fonts/OFL.txt).
 
 ## Run locally
 
@@ -40,14 +44,16 @@ GitHub Pages deploys the `site/` directory after every push to `main`, following
 | File | Purpose |
 | --- | --- |
 | `site/systems.js` | Parameters, SI conversions, calculation models, assumptions, prompts and sources |
+| `site/engineering.js` | Lesson claims, boundaries, conservation accounts, requirements and model-applicability checks |
 | `site/models.js` | Procedural 3D geometry, animation, orbit controls and labels |
-| `site/app.js` | Controls, results, charts, comparison, sharing, notes and exports |
+| `site/app.js` | Controls, results, accounts, charts, requirements, comparison, sharing and CSV export |
 | `site/style.css` | Responsive layout and accessible controls |
 | `tests/physics.test.mjs` | Parameter bounds, conservation, scaling and numerical convergence checks |
+| `tests/engineering.test.mjs` | Conservation accounts, requirement equality and feasibility, input roles and applicability |
 
 ## Model scope
 
-These are transparent teaching models, not validated equipment simulations or full CAD/CFD/FEA models. Animation uses illustrative speed and scale. Calculations use the stated SI conversions. Every system exposes its assumptions and sources.
+These are transparent teaching models, not validated equipment simulations or full CAD/CFD/FEA models. Animation uses illustrative speed and scale. Calculations use the stated SI conversions. Every system exposes its assumptions and sources. Numerical balance closure verifies accounting, not physical fidelity. Exercise requirements are editable instructional choices, not equipment ratings or safety limits.
 
 The steam plant uses a generic heat-engine balance and a Carnot bound, rather than steam tables or a Rankine property calculation. Laser cutting uses an assumed removal-energy budget. The EV and Buggy inputs are illustrative, not measurements of CMU team vehicles. The three-wheeled Buggy is shown on an exaggerated straight slope, not the actual course.
 
@@ -55,6 +61,6 @@ The Physics section connects to the published 33-141 topics and identifies exten
 
 ## Verification
 
-The initial prototype passes 328 parameter configurations across all 14 systems, conservation/scaling checks, and EV integration convergence. Separate DOM checks exercised all 53 inputs, tabs, baseline comparisons, graph paths, notes, sharing and exports. Three.js scene assembly and animation transforms were checked at default and maximum inputs for all 14 models. Browser rendering has not been visually reviewed because browser access was disabled in the authoring environment.
+The current version passes 328 calculation configurations and 208 conservation-account/requirement configurations across all 14 systems, including conservation/scaling checks and EV integration convergence. Separate DOM checks exercised all 53 inputs, tabs, reference comparisons, graph paths, requirement edits, invalid-model states, responsive chart coordinates, sharing and CSV export. Three.js scene assembly and animation transforms were checked at default and maximum inputs for all 14 models. Browser rendering has not been visually reviewed because browser access was disabled in the authoring environment.
 
 WebGL is needed for the 3D view. The text controls, equations and results remain usable if WebGL is unavailable. Tabs support keyboard navigation and animation respects the reduced-motion preference.
