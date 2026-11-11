@@ -1,7 +1,7 @@
-import {systems, defaults, fmt} from './systems.js?v=1.4.0';
-import {lessons, lessonFor, engineering, requirement, perturbation} from './engineering.js?v=1.4.0';
-import {machines, laserMaterials, maxFileBytes, jobSystem, finishJob} from './fabrication.js?v=1.4.0';
-import {createViewer} from './models.js?v=1.4.0';
+import {systems, defaults, fmt} from './systems.js?v=1.4.1';
+import {lessons, lessonFor, engineering, requirement, perturbation} from './engineering.js?v=1.4.1';
+import {machines, laserMaterials, maxFileBytes, jobSystem, finishJob} from './fabrication.js?v=1.4.1';
+import {createViewer} from './models.js?v=1.4.1';
 
 const $=id=>document.getElementById(id);
 const connections={
@@ -275,7 +275,7 @@ function showJobProgress(progress,elapsed,duration,height){
 }
 function parseInWorker(text,kind){
   parserWorker?.terminate();
-  const worker=new Worker(new URL('./fabrication-worker.js?v=1.4.0',import.meta.url),{type:'module'});
+  const worker=new Worker(new URL('./fabrication-worker.js?v=1.4.1',import.meta.url),{type:'module'});
   parserWorker=worker;
   return new Promise((resolve,reject)=>{
     worker.onmessage=({data})=>{worker.terminate();if(parserWorker===worker)parserWorker=null;data.error?reject(new Error(data.error)):resolve(data.job);};
@@ -298,7 +298,7 @@ async function loadJob(file,id=current.id){
     let job;
     if(extension==='svg'){
       if(file.size>2*1024*1024)throw new Error('Simplify the SVG to under 2 MB before previewing.');
-      const {parseSVG}=await import('./fabrication-svg.js?v=1.4.0');
+      const {parseSVG}=await import('./fabrication-svg.js?v=1.4.1');
       job=parseSVG(text);
     }else job=await parseInWorker(text,id);
     if(sequence!==loadSequence)return;

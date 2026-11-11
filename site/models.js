@@ -1,8 +1,8 @@
 import * as T from './vendor/three.module.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
-import {systems} from './systems.js?v=1.4.0';
-import {modelColors as C} from './theme.js?v=1.4.0';
-import {jobTimeline, laserMaterials} from './fabrication.js?v=1.4.0';
+import {systems} from './systems.js?v=1.4.1';
+import {modelColors as C} from './theme.js?v=1.4.1';
+import {jobTimeline, laserMaterials} from './fabrication.js?v=1.4.1';
 export function createViewer(host,onFailure,onJobProgress=()=>{}){
  let renderer;try{renderer=new T.WebGLRenderer({antialias:true,alpha:true});}catch(e){onFailure(e);return null;}
  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(C.background,1);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;
@@ -129,8 +129,9 @@ export function createViewer(host,onFailure,onJobProgress=()=>{}){
  function buildJob(job,p,stock,reset=true){
    if(jobPlayback?.job===job){
      const fraction=jobPlayback.duration?jobPlayback.elapsed/jobPlayback.duration:0;
-     jobPlayback.timeline=jobTimeline(job,p);
-     jobPlayback.duration=jobPlayback.timeline.at(-1).end;
+     jobPlayback.timeFactor=job.kind==='printer'?100/p.speed:1/p.speed;
+     const total=jobPlayback.timeline.at(-1);
+     jobPlayback.duration=total.variableEnd*jobPlayback.timeFactor+total.fixedEnd;
      jobPlayback.elapsed=fraction*jobPlayback.duration;
      if(jobPlayback.sheet){
        jobPlayback.sheet.material.color.setHex(laserMaterials[stock].color);
@@ -199,7 +200,7 @@ export function createViewer(host,onFailure,onJobProgress=()=>{}){
    cursor.material.depthTest=false;
    cursor.renderOrder=3;
    const timeline=jobTimeline(job,p);
-   jobPlayback={job,timeline,duration:timeline.at(-1).end,elapsed:0,sheet,map,bed,gantry,machineMode:false};
+   jobPlayback={job,timeline,timeFactor:printer?100/p.speed:1/p.speed,duration:timeline.at(-1).end,elapsed:0,sheet,map,bed,gantry,machineMode:false};
    orbit.maxZoom=20;
    animate=()=>{
      const playback=jobPlayback;
@@ -207,11 +208,15 @@ export function createViewer(host,onFailure,onJobProgress=()=>{}){
      let low=0,high=playback.timeline.length-1;
      while(low<high){
        const middle=Math.floor((low+high)/2);
-       if(playback.timeline[middle].end<playback.elapsed)low=middle+1;
+       const candidate=playback.timeline[middle];
+       if(candidate.variableEnd*playback.timeFactor+candidate.fixedEnd<playback.elapsed)low=middle+1;
        else high=middle;
      }
      const entry=playback.timeline[low],segment=job.segments[low];
-     const fraction=entry.end===entry.start?1:Math.min(1,Math.max(0,(playback.elapsed-entry.start)/(entry.end-entry.start)));
+     const previous=playback.timeline[low-1];
+     const start=previous?previous.variableEnd*playback.timeFactor+previous.fixedEnd:0;
+     const end=entry.variableEnd*playback.timeFactor+entry.fixedEnd;
+     const fraction=end===start?1:Math.min(1,Math.max(0,(playback.elapsed-start)/(end-start)));
      const point=segment.from.map((v,i)=>v+(segment.to[i]-v)*fraction);
      const position=map(point),from=map(segment.from);
      gantry.visible=playback.machineMode;

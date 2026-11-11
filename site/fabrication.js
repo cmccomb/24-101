@@ -1,4 +1,4 @@
-import {fmt} from './systems.js?v=1.4.0';
+import {fmt} from './systems.js?v=1.4.1';
 
 export const machines = {
   printer: {
@@ -316,11 +316,13 @@ export function jobSystem(system, job, material = 'acrylic') {
 
 export function jobTimeline(job, p) {
   const factor = p.speed / 100;
-  let elapsed = 0;
+  let elapsed = 0, variableEnd = 0, fixedEnd = 0;
   return job.segments.map(segment => {
     const seconds = job.kind === 'printer' ? (segment.seconds || 0) / factor + (segment.dwell || 0) : segment.length / (segment.active ? p.speed : 300);
+    variableEnd += job.kind === 'printer' ? (segment.seconds || 0) : segment.active ? segment.length : 0;
+    fixedEnd += job.kind === 'printer' ? (segment.dwell || 0) : segment.active ? 0 : segment.length / 300;
     const start = elapsed;
     elapsed += seconds;
-    return {start, end: elapsed};
+    return {start, end: elapsed, variableEnd, fixedEnd};
   });
 }
