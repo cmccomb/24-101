@@ -1,9 +1,19 @@
-import {systems, defaults, fmt} from './systems.js?v=1.4.2';
-import {lessons, lessonFor, engineering, requirement, perturbation} from './engineering.js?v=1.4.2';
-import {machines, laserMaterials, maxFileBytes, jobSystem, finishJob} from './fabrication.js?v=1.4.2';
-import {createViewer} from './models.js?v=1.4.2';
+import {systems, defaults, fmt} from './systems.js?v=1.4.3';
+import {lessons, lessonFor, engineering, requirement, perturbation} from './engineering.js?v=1.4.3';
+import {machines, laserMaterials, maxFileBytes, jobSystem, finishJob} from './fabrication.js?v=1.4.3';
+import {createViewer} from './models.js?v=1.4.3';
 
 const $=id=>document.getElementById(id);
+const exampleParts={
+  printer:[
+    {file:'ender3-frame.gcode',label:'Hollow frame'},
+    {file:'ender3-spacer.gcode',label:'Flanged spacer'}
+  ],
+  laser:[
+    {file:'laser-linkage.svg',label:'Linkage plate'},
+    {file:'laser-fit-coupon.svg',label:'Kerf-fit coupon'}
+  ]
+};
 const connections={
   printer:'Temperature, heat and energy conservation connect the deposited volume to a required heating rate.',
   laser:'Power is energy per time. Dividing power by travel speed gives energy per length.',
@@ -245,6 +255,8 @@ function syncFileUI(){
   $('file-label').textContent=current.id==='printer'?'Load G-code':'Load SVG / DXF';
   $('job-file').accept=current.id==='printer'?'.gcode,.gco,.gc':'.svg,.dxf';
   $('job-file').value='';
+  $('job-example').innerHTML='<option value="" disabled>Choose a part…</option>'+exampleParts[current.id].map(part=>`<option value="${part.file}">${part.label}</option>`).join('');
+  $('job-example').value=job?.exampleFile||'';
   $('machine-details').textContent=machines[current.id].detail;
   $('job-material').value=current.material||'acrylic';
   const dimensions=job?.bounds.max.map((max,axis)=>fmt(max-job.bounds.min[axis]));
@@ -275,7 +287,7 @@ function showJobProgress(progress,elapsed,duration,height){
 }
 function parseInWorker(text,kind){
   parserWorker?.terminate();
-  const worker=new Worker(new URL('./fabrication-worker.js?v=1.4.2',import.meta.url),{type:'module'});
+  const worker=new Worker(new URL('./fabrication-worker.js?v=1.4.3',import.meta.url),{type:'module'});
   parserWorker=worker;
   return new Promise((resolve,reject)=>{
     worker.onmessage=({data})=>{worker.terminate();if(parserWorker===worker)parserWorker=null;data.error?reject(new Error(data.error)):resolve(data.job);};
@@ -283,7 +295,7 @@ function parseInWorker(text,kind){
     worker.postMessage({text,kind});
   });
 }
-async function loadJob(file,id=current.id){
+async function loadJob(file,id=current.id,exampleFile=null){
   const sequence=++loadSequence;
   try{
     if(!file||file.size>maxFileBytes)throw new Error('Choose a file up to 20 MB.');
@@ -298,11 +310,12 @@ async function loadJob(file,id=current.id){
     let job;
     if(extension==='svg'){
       if(file.size>2*1024*1024)throw new Error('Simplify the SVG to under 2 MB before previewing.');
-      const {parseSVG}=await import('./fabrication-svg.js?v=1.4.2');
+      const {parseSVG}=await import('./fabrication-svg.js?v=1.4.3');
       job=parseSVG(text);
     }else job=await parseInWorker(text,id);
     if(sequence!==loadSequence)return;
     job.name=file.name;
+    job.exampleFile=exampleFile;
     const saved=pendingFileSettings[id];
     const material=laserMaterials[saved?.get('material')]?saved.get('material'):'acrylic';
     files[id]={job,material,enabled:true,sequence:++fileSequence};
@@ -320,22 +333,35 @@ async function loadJob(file,id=current.id){
     designs[key]=values;
     if(current.id===id)load(id);
   }catch(error){
-    if(sequence===loadSequence&&current.id===id)fileStatus(error.message,true);
-  }finally{
     if(sequence===loadSequence&&current.id===id){
+      fileStatus(error.message,true);
+      $('job-example').value=current.job?.exampleFile||'';
+    }
+  }finally{
+    if(sequence===loadSequence){
       $('fabrication').removeAttribute('aria-busy');
-      $('job-file').value='';
+      if(current.id===id)$('job-file').value='';
     }
   }
 }
 $('job-file').addEventListener('change',e=>{if(e.target.files[0])loadJob(e.target.files[0]);});
-$('job-example').addEventListener('click',async()=>{
-  const id=current.id,printer=id==='printer',name=printer?'ender3-frame.gcode':'laser-linkage.svg';
+$('job-example').addEventListener('change',async e=>{
+  const id=current.id,part=exampleParts[id].find(part=>part.file===e.target.value);
+  if(!part)return;
+  const request=++loadSequence;
+  fileStatus('Loading example…');
   try{
-    const response=await fetch(new URL('./examples/'+name,import.meta.url));
+    const response=await fetch(new URL('./examples/'+part.file,import.meta.url));
     if(!response.ok)throw new Error('The example could not be loaded.');
-    await loadJob(new File([await response.text()],name,{type:'text/plain'}),id);
-  }catch(error){fileStatus(error.message,true);}
+    const text=await response.text();
+    if(request!==loadSequence)return;
+    await loadJob(new File([text],part.file,{type:'text/plain'}),id,part.file);
+  }catch(error){
+    if(request===loadSequence&&current.id===id){
+      fileStatus(error.message,true);
+      $('job-example').value=current.job?.exampleFile||'';
+    }
+  }
 });
 $('job-mechanism').addEventListener('click',()=>{files[current.id].enabled=!current.job;load(current.id);});
 $('job-material').addEventListener('change',e=>{files[current.id].material=e.target.value;load(current.id);});
@@ -350,7 +376,7 @@ $('job-center').addEventListener('click',()=>{
     segments.push({...segment,from:segment.active?from:previous,to});
     previous=to;
   }
-  files[current.id].job=finishJob('laser',segments,{name:job.name,warnings:job.warnings});
+  files[current.id].job=finishJob('laser',segments,{name:job.name,warnings:job.warnings,exampleFile:job.exampleFile});
   load(current.id);
 });
 $('job-seek').addEventListener('input',e=>{viewer?.setPlaying(false);viewer?.setProgress(Number(e.target.value)/1000);playbackLabel();});

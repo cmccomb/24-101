@@ -20,6 +20,17 @@
 .file-picker input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
 .fabrication :is(label, select) { font-size: 12px; }
 .fabrication select { padding: 3px; background: white; border: 1px solid var(--line); }
+.example-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+.example-picker select {
+  min-height: 32px;
+  max-width: 170px;
+  color: var(--ink);
+}
 .local-file-note { font-size: 11px; color: var(--muted); margin-left: auto; }
 #file-status { width: 100%; font-size: 12px; line-height: 1.4; margin: 2px 0 0; color: var(--muted); }
 #file-status[data-error="true"] { color: var(--red); }

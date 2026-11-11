@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>24-101 · Mechanical Engineering Systems</title>
   <meta name="description" content="Define a system boundary. Apply conservation laws. Change a design variable and test a requirement.">
-  <link rel="stylesheet" href="./tokens.css?v=1.4.2">
-  <link rel="stylesheet" href="./style.css?v=1.4.2">
-  <link rel="stylesheet" href="./lab.css?v=1.4.2">
+  <link rel="stylesheet" href="./tokens.css?v=1.4.3">
+  <link rel="stylesheet" href="./style.css?v=1.4.3">
+  <link rel="stylesheet" href="./lab.css?v=1.4.3">
 </head>
 <body class="lab">
   <a class="skip" href="#main">Skip to system</a>
@@ -26,7 +26,7 @@
         <h1 id="claim">Faster deposition requires more heating power.</h1>
         <div id="fabrication" class="fabrication" hidden>
           <label class="file-picker"><span id="file-label">Load G-code</span><input id="job-file" type="file" accept=".gcode,.gco,.gc" aria-labelledby="file-label"></label>
-          <button id="job-example" class="text-button">Example job</button>
+          <label class="example-picker">Example part <select id="job-example"><option value="" disabled selected>Choose a part…</option></select></label>
           <button id="job-mechanism" class="text-button" hidden>Mechanism</button>
           <button id="job-center" class="text-button" hidden>Center on bed</button>
           <label id="stock-label" hidden>Stock <select id="job-material"><option value="acrylic">Acrylic</option><option value="plywood">Plywood</option></select></label>
@@ -101,6 +101,6 @@
     </main>
   </div>
   <div id="toast" role="status"></div>
-  <script type="module" src="./app.js?v=1.4.2"></script>
+  <script type="module" src="./app.js?v=1.4.3"></script>
 </body>
 </html>

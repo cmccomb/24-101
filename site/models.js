@@ -1,8 +1,8 @@
 import * as T from './vendor/three.module.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
-import {systems} from './systems.js?v=1.4.2';
-import {modelColors as C} from './theme.js?v=1.4.2';
-import {jobTimeline, laserMaterials} from './fabrication.js?v=1.4.2';
+import {systems} from './systems.js?v=1.4.3';
+import {modelColors as C} from './theme.js?v=1.4.3';
+import {jobTimeline, laserMaterials} from './fabrication.js?v=1.4.3';
 export function createViewer(host,onFailure,onJobProgress=()=>{}){
  let renderer;try{renderer=new T.WebGLRenderer({antialias:true,alpha:true});}catch(e){onFailure(e);return null;}
  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(C.background,1);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;

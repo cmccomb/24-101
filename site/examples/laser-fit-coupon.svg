@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100mm" height="70mm" viewBox="0 0 100 70">
+  <g fill="none" stroke="#c41230" stroke-width="0.1">
+    <!-- Nominal slot widths from left to right: 3.0, 3.2 and 3.4 mm. -->
+    <rect x="25" y="18" width="3.0" height="30"/>
+    <rect x="48.4" y="18" width="3.2" height="30"/>
+    <rect x="71.6" y="18" width="3.4" height="30"/>
+    <circle cx="16" cy="35" r="2.5"/>
+    <circle cx="84" cy="35" r="2.5"/>
+    <rect x="10" y="10" width="80" height="50" rx="4"/>
+  </g>
+</svg>

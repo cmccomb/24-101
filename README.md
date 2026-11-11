@@ -23,7 +23,7 @@ The printer profile follows the course-rack Ender-3 setup. Its build envelope is
 
 - **Printer.** Export text G-code from Cura using the Ender-3 profile, then choose **Load G-code**. Replay and scrub the actual deposition and travel paths, inspect Z height, and compare feed, extrusion and temperature overrides with nominal motion time and peak hotend demand. **Machine view** animates the bed and X/Z head motion. **Fit job** shows paths in build-plate coordinates.
 - **Laser.** Choose **Load SVG / DXF**. Replay vector outlines and travel in document order, center the drawing on the bed, and compare acrylic with plywood using editable power, cut feed, thickness and kerf.
-- **Examples.** Each fabrication lesson includes a synthetic example job. **Mechanism** restores its original parameterized teaching schematic.
+- **Examples.** Use **Example part** to choose a hollow frame or flanged spacer for the printer, and a linkage plate or kerf-fit coupon for the laser. The spacer includes a bore, a flange and alternating infill. The coupon has nominal 3.0, 3.2 and 3.4 mm slots. **Mechanism** restores the original teaching schematic.
 - **Privacy.** File parsing and playback run inside the browser. Files remain in memory until the page is closed or refreshed. A shared file-mode URL contains settings. Reopen the same file to restore that job.
 
 G-code supports millimeter/inch units, absolute/relative axes and extrusion, G92 resets, G0/G1 moves, I/J XY arcs, retraction recovery, G4 dwells and feed/flow overrides. Unsupported motion, coordinate systems, firmware retraction and multiple extruders produce an error.
