@@ -116,7 +116,9 @@ export const lessons = {
 };
 
 const term=(label,value,stored=false)=>({label,value,stored});
+export const lessonFor=s=>s.lesson||lessons[s.id];
 export function engineering(s,p,r=s.calc(p)) {
+  if(s.account)return s.account(p,r);
   const l=lessons[s.id],m=r.metrics.map(v=>v.value);let input=[],output=[];
   switch(s.id){
     case 'printer': input=[term('Heater demand',m[2])];output=[term('Filament heating',m[1]),term('Ambient loss',.08*(p.temp-25))];break;
@@ -139,6 +141,6 @@ export function engineering(s,p,r=s.calc(p)) {
   return {...l,input,output,total,residual,valid,validity:valid?'Within stated model assumptions.':'Liquid-water model exceeded: T ≥ 100 °C. Values beyond this boundary are extrapolations.'};
 }
 
-export function requirement(s,r,target,valid=true){const c=lessons[s.id].criterion,actual=r.metrics[c.metric].value;return{...c,target,actual,met:valid&&(c.sense==='max'?actual<=target:actual>=target),valid,unit:r.metrics[c.metric].unit,margin:c.sense==='max'?target-actual:actual-target};}
+export function requirement(s,r,target,valid=true){const c=lessonFor(s).criterion,actual=r.metrics[c.metric].value;return{...c,target,actual,met:valid&&(c.sense==='max'?actual<=target:actual>=target),valid,unit:r.metrics[c.metric].unit,margin:c.sense==='max'?target-actual:actual-target};}
 
 export function perturbation(s,p,key,index){const def=s.params.find(v=>v.key===key),base=p[key],wanted=base*1.1;let next=Math.min(def.max,Math.max(def.min,wanted));if(Math.abs(next-base)<1e-10)next=Math.max(def.min,base*.9);if(Math.abs(base)<1e-10)next=Math.min(def.max,base+.1*(def.max-def.min));if(def.integer)next=Math.round(next);const before=s.calc(p).metrics[index].value,after=s.calc({...p,[key]:next}).metrics[index].value;return{from:base,to:next,inputPercent:base?100*(next-base)/Math.abs(base):null,before,after,outputPercent:before?100*(after-before)/Math.abs(before):null};}

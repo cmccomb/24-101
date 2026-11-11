@@ -1,15 +1,16 @@
 import * as T from './vendor/three.module.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
-import {systems} from './systems.js?v=1.3.1';
-import {modelColors as C} from './theme.js?v=1.3.1';
-export function createViewer(host,onFailure){
+import {systems} from './systems.js?v=1.4.0';
+import {modelColors as C} from './theme.js?v=1.4.0';
+import {jobTimeline, laserMaterials} from './fabrication.js?v=1.4.0';
+export function createViewer(host,onFailure,onJobProgress=()=>{}){
  let renderer;try{renderer=new T.WebGLRenderer({antialias:true,alpha:true});}catch(e){onFailure(e);return null;}
  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(C.background,1);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;
  host.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','Interactive 3D system model. Drag to orbit, scroll to zoom.');renderer.domElement.setAttribute('role','img');
  const scene=new T.Scene();scene.fog=new T.Fog(C.background,14,35);const camera=new T.OrthographicCamera(-4,4,2.9,-2.9,.05,100);const orbit=new OrbitControls(camera,renderer.domElement);orbit.enableDamping=true;orbit.minZoom=.55;orbit.maxZoom=3;orbit.maxPolarAngle=Math.PI*.49;renderer.domElement.style.touchAction='pan-y';
  scene.add(new T.HemisphereLight(0xffffff,0x9da4a9,2));const key=new T.DirectionalLight(0xffffff,2.5);key.position.set(3,8,5);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-6;key.shadow.camera.right=6;key.shadow.camera.top=6;key.shadow.camera.bottom=-6;scene.add(key);const rim=new T.DirectionalLight(0xffffff,1.2);rim.position.set(-4,3,-4);scene.add(rim);
  const floor=new T.Mesh(new T.PlaneGeometry(100,100),new T.MeshStandardMaterial({color:C.background,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.03;floor.receiveShadow=true;scene.add(floor);const grid=new T.GridHelper(12,24,C.grid,C.grid);grid.position.y=-.02;scene.add(grid);
- let model=new T.Group(),animate=()=>{},labels=[],phase=0,last=0,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,rate=1,cut=false,frames=0;
+ let model=new T.Group(),animate=()=>{},labels=[],phase=0,last=0,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,rate=1,cut=false,frames=0,jobPlayback=null,jobRate=30,lastProgress=-Infinity;
  scene.add(model);
  const material=(color,extra={})=>new T.MeshStandardMaterial({color,roughness:.7,metalness:.1,...extra});
  function mesh(geo,color,pos=[0,0,0],parent=model,extra={}){let o=new T.Mesh(geo,material(color,extra));o.position.set(...pos);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
@@ -27,7 +28,7 @@ export function createViewer(host,onFailure){
  function heatExchanger(pos,color,parent=model){let g=group(pos,parent);box(.9,1.25,.65,C.steel,[0,.75,0],g);for(let i=0;i<10;i++)box(.95,.035,.7,C.light,[0,.25+i*.11,0],g);return fan(.35,[0,.75,.42],g);}
  function vehicle(race,p){let car=group([0,.48,0]);if(race){box(2.25,.23,.8,C.dark,[0,0,0],car);box(.8,.26,.68,C.steel,[-.45,.2,0],car);box(.65,.18,.35,C.light,[1,.1,0],car);box(.8,.5,.7,C.dark,[.2,.25,0],car);box(.6,.2,.75,C.steel,[-.75,.33,0],car);box(.14,.2,1.55,C.light,[1.35,-.05,0],car);box(.14,.32,1.5,C.steel,[-1.2,.45,0],car);link([-.4,.3,-.4],[.2,.75,-.4],.035,C.steel,car);link([-.4,.3,.4],[.2,.75,.4],.035,C.steel,car);}else{let body=mesh(new T.SphereGeometry(1,40,24),C.steel,[0,.12,0],car);body.scale.set(1.45,.34,.43);let visor=mesh(new T.SphereGeometry(1,24,16),C.dark,[.4,.25,0],car,{metalness:.1});visor.scale.set(.45,.19,.31);link([-1.2,.2,0],[-1.7,.65,0],.035,C.light,car);link([-1.7,.65,-.3],[-1.7,.65,.3],.035,C.light,car);}
  let wheels=[];const contacts=race?[[-.9,-.57],[-.9,.57],[.8,-.57],[.8,.57]]:[[-.9,-.57],[-.9,.57],[.8,0]];for(const [x,z] of contacts){wheels.push(wheel(race?.3:.19,[x,-.12,z],car));link([x,0,0],[x,-.12,z],.025,C.steel,car);}return{car,wheels};}
- function clear(){scene.remove(model);model.traverse(o=>{o.geometry?.dispose();if(o.material){[].concat(o.material).forEach(m=>m.dispose());}});model=new T.Group();scene.add(model);labels=[];host.querySelectorAll('.model-label').forEach(e=>e.remove());}
+ function clear(){scene.remove(model);model.traverse(o=>{o.geometry?.dispose();if(o.material){[].concat(o.material).forEach(m=>m.dispose());}});model=new T.Group();scene.add(model);labels=[];jobPlayback=null;host.querySelectorAll('.model-label').forEach(e=>e.remove());}
  function build(id,p,reset=true){clear();let ticks=[];const outputs=systems.find(s=>s.id===id).calc(p).metrics;
   if(id==='printer'){
    box(3.6,.2,2.5,C.dark,[0,.1,0]);for(let x of [-1.5,1.5]){box(.17,3.25,.22,C.steel,[x,1.8,-.8]);link([x,.35,.9],[x,.35,-1],.055,C.light);}box(3.25,.16,.25,C.steel,[0,3.35,-.8]);box(2.8,.1,1.9,C.light,[0,.55,0]);
@@ -125,10 +126,160 @@ export function createViewer(host,onFailure){
   }
   model.traverse(o=>{if(o.isMesh&&o.material){o.userData.baseOpacity=o.material.opacity;o.userData.baseTransparent=o.material.transparent;}});
   labels.forEach(l=>{l.el=document.createElement('span');l.el.className='model-label';l.el.textContent=l.text;host.append(l.el);});animate=t=>ticks.forEach(f=>f(t));if(reset)resetCamera(id);setCutaway(cut);animate(phase);}
- function resetCamera(id){const bicycle=id==='bicycle';camera.position.set(bicycle?2.2:id==='wind'?5:5.4,bicycle?2.7:id==='wind'?3.2:4.1,bicycle?8:id==='wind'?7.5:6.4);camera.zoom=1;camera.updateProjectionMatrix();orbit.target.set(0,id==='wind'?1.8:1.25,0);orbit.update();}
+ function buildJob(job,p,stock,reset=true){
+   if(jobPlayback?.job===job){
+     const fraction=jobPlayback.duration?jobPlayback.elapsed/jobPlayback.duration:0;
+     jobPlayback.timeline=jobTimeline(job,p);
+     jobPlayback.duration=jobPlayback.timeline.at(-1).end;
+     jobPlayback.elapsed=fraction*jobPlayback.duration;
+     if(jobPlayback.sheet){
+       jobPlayback.sheet.material.color.setHex(laserMaterials[stock].color);
+       jobPlayback.sheet.scale.y=p.thick/3.175;
+       jobPlayback.sheet.position.y=.6-.0125*jobPlayback.sheet.scale.y;
+     }
+     if(reset)resetCamera(job.kind);
+     return;
+   }
+   clear();
+   const printer=job.kind==='printer',scale=printer?3.2/220:3.8/1219.2;
+   const area=printer?[220,220]:[1219.2,914.4],base=printer?.55:.6;
+   const map=point=>new T.Vector3((point[0]-area[0]/2)*scale,base+point[2]*scale,(area[1]/2-point[1])*scale);
+   let sheet=null,bed=null;
+   const gantry=group(),head=group([0,0,0],gantry);
+   if(printer){
+     box(3.75,.2,3.75,C.dark,[0,.1,0]);
+     bed=group();
+     box(3.2,.1,3.2,C.light,[0,.49,0],bed);
+     for(const x of [-1.8,1.8]){
+       box(.13,3.95,.17,C.dark,[x,2.12,0]);
+     }
+     for(const x of [-.2,.2])link([x,.3,1.8],[x,.3,-1.8],.035,C.steel);
+     box(3.72,.14,.2,C.dark,[0,4.12,0]);
+     link([-1.62,.4,.09],[-1.62,3.95,.09],.025,C.light);
+     box(.42,1.7,.28,C.steel,[2.04,1.3,.1]);
+     const display=box(.7,.18,.5,C.dark,[1.4,.44,1.58]);display.rotation.x=.35;
+     const spool=cyl(.43,.25,C.dark,[.65,4.68,0]);spool.rotation.x=Math.PI/2;
+     box(3.65,.13,.18,C.dark,[0,.25,0],gantry);
+     box(.4,.43,.28,C.dark,[0,.35,0],head);
+     mesh(new T.ConeGeometry(.04,.1,12),C.orange,[0,.05,0],head).rotation.z=Math.PI;
+     box(.38,.32,.3,C.dark,[-1.76,.3,-.12],gantry);
+   }else{
+     box(4,.32,3.12,C.dark,[0,.22,0]);
+     for(let index=0;index<22;index++)box(3.8,.06,.025,C.steel,[0,.52,-1.42+index*.135]);
+     for(const x of [-1.95,1.95])box(.08,.13,3.03,C.steel,[x,.58,0]);
+     const width=(job.bounds.max[0]-job.bounds.min[0])*scale,depth=(job.bounds.max[1]-job.bounds.min[1])*scale;
+     const center=map(job.bounds.min.map((min,i)=>(min+job.bounds.max[i])/2));
+     sheet=box(Math.max(width,.02),.025,Math.max(depth,.02),laserMaterials[stock].color,[center.x,.5875,center.z]);
+     sheet.scale.y=p.thick/3.175;
+     sheet.position.y=.6-.0125*sheet.scale.y;
+     box(3.85,.12,.14,C.steel,[0,.88,0],gantry);
+     box(.22,.3,.24,C.red,[0,.77,0],head);
+   }
+   const active=[],travel=[],counts=[];
+   let completed=0;
+   for(const segment of job.segments){
+     const vertices=segment.active?active:travel;
+     vertices.push(...map(segment.from).toArray(),...map(segment.to).toArray());
+     if(segment.active)completed+=2;
+     counts.push(completed);
+   }
+   const makeLines=(vertices,color,opacity)=>{
+     const geometry=new T.BufferGeometry();
+     geometry.setAttribute('position',new T.Float32BufferAttribute(vertices,3));
+     const object=new T.LineSegments(geometry,new T.LineBasicMaterial({color,transparent:true,opacity,depthTest:false}));
+     object.renderOrder=2;(bed||model).add(object);return object;
+   };
+   makeLines(active,C.reference??C.steel,.45);
+   makeLines(travel,C.blue,.18);
+   const deposited=makeLines(active,C.red,1);
+   deposited.geometry.setDrawRange(0,0);
+   const partial=makeLines([0,0,0,0,0,0],C.red,1);
+   partial.frustumCulled=false;
+   const cursor=ball(.018,C.red,[0,0,0],bed||model);
+   cursor.material.depthTest=false;
+   cursor.renderOrder=3;
+   const timeline=jobTimeline(job,p);
+   jobPlayback={job,timeline,duration:timeline.at(-1).end,elapsed:0,sheet,map,bed,gantry,machineMode:false};
+   orbit.maxZoom=20;
+   animate=()=>{
+     const playback=jobPlayback;
+     if(!playback)return;
+     let low=0,high=playback.timeline.length-1;
+     while(low<high){
+       const middle=Math.floor((low+high)/2);
+       if(playback.timeline[middle].end<playback.elapsed)low=middle+1;
+       else high=middle;
+     }
+     const entry=playback.timeline[low],segment=job.segments[low];
+     const fraction=entry.end===entry.start?1:Math.min(1,Math.max(0,(playback.elapsed-entry.start)/(entry.end-entry.start)));
+     const point=segment.from.map((v,i)=>v+(segment.to[i]-v)*fraction);
+     const position=map(point),from=map(segment.from);
+     gantry.visible=playback.machineMode;
+     if(printer){
+       bed.position.z=playback.machineMode?-position.z:0;
+       gantry.position.y=position.y;
+       head.position.x=position.x;
+     }else{
+       gantry.position.z=position.z;
+       head.position.x=position.x;
+     }
+     cursor.position.copy(position);
+     deposited.geometry.setDrawRange(0,playback.elapsed>=playback.duration?completed:(low?counts[low-1]:0));
+     partial.visible=segment.active;
+     const attribute=partial.geometry.getAttribute('position');
+     attribute.setXYZ(0,from.x,from.y,from.z);attribute.setXYZ(1,position.x,position.y,position.z);attribute.needsUpdate=true;
+     if(performance.now()-lastProgress>100){
+       lastProgress=performance.now();
+       onJobProgress(playback.duration?playback.elapsed/playback.duration:0,playback.elapsed,playback.duration,point[2]);
+     }
+   };
+   resetCamera(job.kind);
+   animate();
+   model.traverse(o=>{if(o.isMesh&&o.material){o.userData.baseOpacity=o.material.opacity;o.userData.baseTransparent=o.material.transparent;}});
+   setCutaway(cut);
+ }
+ function machineView(id){
+   if(jobPlayback)jobPlayback.machineMode=true;
+   orbit.target.set(0,id==='printer'?2:1.1,0);
+   camera.position.set(5.4,id==='printer'?4.1:5.3,6.4);
+   camera.zoom=id==='printer'?.65:1;
+   camera.updateProjectionMatrix();orbit.update();
+ }
+ function resetCamera(id){
+   if(jobPlayback){
+     jobPlayback.machineMode=false;
+     if(jobPlayback.bed)jobPlayback.bed.position.z=0;
+     const job=jobPlayback.job,center=job.bounds.min.map((v,i)=>(v+job.bounds.max[i])/2);
+     const target=jobPlayback.map(center);
+     orbit.target.copy(target);
+     camera.position.copy(target).add(new T.Vector3(3.5,id==='printer'?4:7,6));
+     camera.zoom=1;
+     camera.updateProjectionMatrix();orbit.update();camera.updateMatrixWorld();
+     let extent=.001;
+     for(let mask=0;mask<8;mask++){
+       const point=job.bounds.min.map((min,axis)=>mask&(1<<axis)?job.bounds.max[axis]:min);
+       const projected=jobPlayback.map(point).project(camera);
+       extent=Math.max(extent,Math.abs(projected.x),Math.abs(projected.y));
+     }
+     camera.zoom=Math.max(.55,Math.min(20,.77/extent));
+     camera.updateProjectionMatrix();return;
+   }
+   orbit.maxZoom=3;
+   const bicycle=id==='bicycle';camera.position.set(bicycle?2.2:id==='wind'?5:5.4,bicycle?2.7:id==='wind'?3.2:4.1,bicycle?8:id==='wind'?7.5:6.4);camera.zoom=1;camera.updateProjectionMatrix();orbit.target.set(0,id==='wind'?1.8:1.25,0);orbit.update();}
  function setCutaway(value){cut=value;model.traverse(o=>{if(o.isMesh&&o.material){o.material.opacity=cut?Math.min(o.userData.baseOpacity,.32):o.userData.baseOpacity;o.material.transparent=cut||o.userData.baseTransparent;o.material.depthWrite=!cut;}});}
  const observer=new ResizeObserver(()=>{const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h);const extent=Math.max(2.2,2.25*h/w);camera.left=-extent*w/h;camera.right=extent*w/h;camera.top=extent;camera.bottom=-extent;camera.updateProjectionMatrix();});observer.observe(host);
- let raf;function render(now){let dt=Math.min((now-last)/1000,.05);last=now;const rect=host.getBoundingClientRect();if(!rect.width||!rect.height){raf=requestAnimationFrame(render);return;}if(playing)phase+=dt*rate;animate(phase);orbit.update();labels.forEach(l=>{let v=l.pos.clone().project(camera);l.el.style.left=`${(v.x+1)*rect.width/2}px`;l.el.style.top=`${(-v.y+1)*rect.height/2}px`;l.el.style.display=v.z<1?'':'none';});renderer.render(scene,camera);frames++;raf=requestAnimationFrame(render);}raf=requestAnimationFrame(render);
+ let raf;function render(now){let dt=Math.min((now-last)/1000,.05);last=now;const rect=host.getBoundingClientRect();if(!rect.width||!rect.height){raf=requestAnimationFrame(render);return;}if(playing){
+   phase+=dt*rate;
+   if(jobPlayback){
+     jobPlayback.elapsed=Math.min(jobPlayback.duration,jobPlayback.elapsed+dt*jobRate);
+     if(jobPlayback.elapsed>=jobPlayback.duration)playing=false;
+   }
+ }animate(phase);orbit.update();labels.forEach(l=>{let v=l.pos.clone().project(camera);l.el.style.left=`${(v.x+1)*rect.width/2}px`;l.el.style.top=`${(-v.y+1)*rect.height/2}px`;l.el.style.display=v.z<1?'':'none';});renderer.render(scene,camera);frames++;raf=requestAnimationFrame(render);}raf=requestAnimationFrame(render);
  renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();onFailure(new Error('Graphics context lost. Reload this page to restore the model.'));});
- return{build,resetCamera,setCutaway,setPlaying:v=>playing=v,setRate:v=>rate=v,get playing(){return playing;},get frames(){return frames;},dispose(){cancelAnimationFrame(raf);observer.disconnect();clear();orbit.dispose();renderer.dispose();}};
+ return{build,buildJob,machineView,resetCamera,setCutaway,setPlaying:v=>{
+   if(v&&jobPlayback?.elapsed>=jobPlayback?.duration)jobPlayback.elapsed=0;
+   playing=v;
+ },setProgress:v=>{
+   if(jobPlayback){jobPlayback.elapsed=Math.min(1,Math.max(0,v))*jobPlayback.duration;lastProgress=-Infinity;animate();}
+ },setRate:v=>jobRate=v,get playing(){return playing;},get frames(){return frames;},dispose(){cancelAnimationFrame(raf);observer.disconnect();clear();orbit.dispose();renderer.dispose();}};
 }

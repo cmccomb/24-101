@@ -14,6 +14,22 @@
 .lab .system-name { margin-bottom: 5px; }
 .lab h1 { margin: 0; font-size: clamp(24px, 2.25vw, 36px); line-height: 1.2; }
 .system-picker { display: none; }
+.fabrication { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 16px; margin-top: 12px; }
+.file-picker { position: relative; display: inline-flex; align-items: center; min-height: 32px; padding: 2px 10px; border: 1px solid var(--red); color: var(--red); cursor: pointer; font-size: 12px; }
+.file-picker:focus-within { outline: 2px solid var(--red); outline-offset: 3px; }
+.file-picker input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
+.fabrication :is(label, select) { font-size: 12px; }
+.fabrication select { padding: 3px; background: white; border: 1px solid var(--line); }
+.local-file-note { font-size: 11px; color: var(--muted); margin-left: auto; }
+#file-status { width: 100%; font-size: 12px; line-height: 1.4; margin: 2px 0 0; color: var(--muted); }
+#file-status[data-error="true"] { color: var(--red); }
+.job-playback { display: grid; grid-template-columns: minmax(60px, 1fr) 85px; gap: 3px 8px; align-items: center; padding: 4px 0; }
+.job-playback>label { font-size: 11px; }
+.job-playback input { grid-row: 2; height: 24px; margin: 0; min-width: 0; width: 100%; accent-color: var(--red); }
+.job-playback select { grid-column: 2; grid-row: 1 / span 2; width: 85px; padding: 4px; background: white; border: 1px solid var(--line); font-size: 11px; }
+.job-playback output { grid-column: 1 / -1; font-variant-numeric: tabular-nums; font-size: 11px; color: var(--muted); }
+#job-summary, #job-notes, #machine-details { font-size: 12px; color: var(--muted); }
+.lab:has(.job-playback:not([hidden])) #viewport { height: clamp(180px, 30vh, 250px); }
 
 .sr-only {
   position: absolute;
@@ -171,6 +187,9 @@
   .lab .lesson-heading { margin-bottom: 8px; }
   .lab .system-picker select { min-height: 32px; }
   .lab h1 { font-size: 22px; }
+  .fabrication { gap: 2px 12px; margin-top: 8px; }
+  .local-file-note { margin-left: 0; }
+  .lab:has(.job-playback:not([hidden])) #viewport { height: 138px; }
   .live-evidence { display: block; background: var(--paper); }
   .lab .results { margin-bottom: 6px; }
   .lab .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -201,5 +220,5 @@
 
 @media (max-width: 650px) and (min-height: 600px) {
   .live-evidence { position: sticky; z-index: 5; top: 0; padding-bottom: 4px; }
-  .lab .inspector :is(button, input) { scroll-margin-top: 420px; }
+  .lab .inspector :is(button, input) { scroll-margin-top: calc(var(--evidence-height, 420px) + 12px); }
 }

@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>24-101 · Mechanical Engineering Systems</title>
   <meta name="description" content="Define a system boundary. Apply conservation laws. Change a design variable and test a requirement.">
-  <link rel="stylesheet" href="./tokens.css?v=1.3.1">
-  <link rel="stylesheet" href="./style.css?v=1.3.1">
-  <link rel="stylesheet" href="./lab.css?v=1.3.1">
+  <link rel="stylesheet" href="./tokens.css?v=1.4.0">
+  <link rel="stylesheet" href="./style.css?v=1.4.0">
+  <link rel="stylesheet" href="./lab.css?v=1.4.0">
 </head>
 <body class="lab">
   <a class="skip" href="#main">Skip to system</a>
@@ -24,6 +24,15 @@
         <label class="system-picker">System <select id="system-select"></select></label>
         <p class="system-name"><span id="number">01</span><span id="system-name">3D printer</span></p>
         <h1 id="claim">Faster deposition requires more heating power.</h1>
+        <div id="fabrication" class="fabrication" hidden>
+          <label class="file-picker"><span id="file-label">Load G-code</span><input id="job-file" type="file" accept=".gcode,.gco,.gc" aria-labelledby="file-label"></label>
+          <button id="job-example" class="text-button">Example job</button>
+          <button id="job-mechanism" class="text-button" hidden>Mechanism</button>
+          <button id="job-center" class="text-button" hidden>Center on bed</button>
+          <label id="stock-label" hidden>Stock <select id="job-material"><option value="acrylic">Acrylic</option><option value="plywood">Plywood</option></select></label>
+          <span class="local-file-note">Files stay in this browser</span>
+          <p id="file-status" role="status" hidden></p>
+        </div>
       </header>
       <div class="workspace">
         <div class="live-evidence">
@@ -39,8 +48,13 @@
             </div>
             <figure class="model-figure" id="model-panel">
               <div id="viewport"><div id="loading" class="loading">Loading 3D model.</div></div>
-              <div class="model-tools"><button id="play" aria-label="Pause animation">Pause motion</button><button id="camera">Reset view</button><label><input id="cutaway" type="checkbox"> Transparent</label></div>
-              <figcaption>Schematic geometry and motion</figcaption>
+              <div class="model-tools"><button id="play" aria-label="Pause animation">Pause motion</button><button id="camera">Reset view</button><button id="machine-view" hidden>Machine view</button><label><input id="cutaway" type="checkbox"> Transparent</label></div>
+              <div id="job-playback" class="job-playback" hidden>
+                <label for="job-seek">Job position</label><input id="job-seek" type="range" min="0" max="1000" step="1" value="0">
+                <select id="job-rate" aria-label="Playback speed"><option value="1">1× time</option><option value="30" selected>30× time</option><option value="120">120× time</option><option value="600">600× time</option></select>
+                <output id="job-clock" for="job-seek" aria-live="off"></output>
+              </div>
+              <figcaption id="model-caption">Schematic geometry and motion</figcaption>
             </figure>
             <section class="parameter-study" id="plot-panel" aria-label="Response plot">
               <div class="study-controls"><label>Vary <select id="sweep-input"></select></label><label>Measure <select id="sweep-output"></select></label></div>
@@ -62,6 +76,9 @@
       <section class="lesson-details" aria-label="Design exercise and physics">
         <h2>Test the claim</h2>
         <p id="problem"></p><p id="prompt"></p><p id="schedule" hidden></p>
+        <p id="job-summary" hidden></p>
+        <p id="job-notes" hidden></p>
+        <p id="machine-details" hidden></p>
         <p id="local-response"></p><p id="reference-inputs" class="reference-inputs"></p>
         <button id="csv" class="text-button">Download plot data (CSV)</button>
         <details class="physics" id="physics">
@@ -84,6 +101,6 @@
     </main>
   </div>
   <div id="toast" role="status"></div>
-  <script type="module" src="./app.js?v=1.3.1"></script>
+  <script type="module" src="./app.js?v=1.4.0"></script>
 </body>
 </html>

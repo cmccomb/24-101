@@ -1,4 +1,4 @@
-import {systems,defaults,fmt} from '../systems.js?v=1.3.1';
+import {systems,defaults,fmt} from '../systems.js?v=1.4.0';
 const root=getComputedStyle(document.documentElement);
 for(const swatch of document.querySelectorAll('[data-token]'))swatch.querySelector('code').textContent=root.getPropertyValue('--color-'+swatch.dataset.token).trim().toUpperCase();
 const system=systems.find(s=>s.id==='printer'),initial=defaults(system),reference=system.calc(initial);

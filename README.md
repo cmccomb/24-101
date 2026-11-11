@@ -17,7 +17,22 @@ Fourteen mechanical engineering systems organized around engineering claims, exp
 - Download parameter-study data as CSV, including the applicability flag.
 - Share a URL that preserves the system, inputs and exercise requirement.
 
-There are no student accounts, analytics or external runtime dependencies. Three.js 0.170.0 and OrbitControls are vendored under their [MIT license](site/vendor/THREE-LICENSE.txt). OrbitControls' import path is adjusted to use the local Three.js module. Open Sans is vendored under the [SIL Open Font License](site/vendor/fonts/OFL.txt).
+## Simulate a fabrication file
+
+The printer profile follows the course-rack Ender-3 setup. Its build envelope is 220 × 220 × 250 mm with a 0.4 mm nozzle and 1.75 mm PLA. The laser profile follows TechSpark's published Epilog Fusion Pro specification, with 120 W CO₂ power and a 48 × 36 inch cutting area.
+
+- **Printer.** Export text G-code from Cura using the Ender-3 profile, then choose **Load G-code**. Replay and scrub the actual deposition and travel paths, inspect Z height, and compare feed, extrusion and temperature overrides with nominal motion time and peak hotend demand. **Machine view** animates the bed and X/Z head motion. **Fit job** shows paths in build-plate coordinates.
+- **Laser.** Choose **Load SVG / DXF**. Replay vector outlines and travel in document order, center the drawing on the bed, and compare acrylic with plywood using editable power, cut feed, thickness and kerf.
+- **Examples.** Each fabrication lesson includes a synthetic example job. **Mechanism** restores its original parameterized teaching schematic.
+- **Privacy.** File parsing and playback run inside the browser. Files remain in memory until the page is closed or refreshed. A shared file-mode URL contains settings. Reopen the same file to restore that job.
+
+G-code supports millimeter/inch units, absolute/relative axes and extrusion, G92 resets, G0/G1 moves, I/J XY arcs, retraction recovery, G4 dwells and feed/flow overrides. Unsupported motion, coordinate systems, firmware retraction and multiple extruders produce an error.
+
+SVG imports require explicit page dimensions, vector outlines and expanded text/clones. DXF imports support LINE, ARC, CIRCLE and straight 2D POLYLINE/LWPOLYLINE entities with millimeter, centimeter, meter, inch or foot units. Unitless DXF coordinates are interpreted as millimeters with a visible note. Curves are sampled at approximately 0.35 mm intervals. Jobs are limited to 300,000 preview segments and 20 MB, with a 2 MB limit for SVG.
+
+Time estimates use constant commanded feed and include known dwells. Heating, homing, acceleration, controller limits, operator pauses and controller path optimization require additional modeling. The printer thermal estimate uses uniform nozzle temperature and sensible heating. The 40 W hotend budget, material-removal energies and optical absorption fractions are explicit classroom assumptions. TechSpark material qualification and machine settings remain part of the fabrication workflow. Raster engraving and PDF/AI files require conversion to supported vector outlines.
+
+There are no student accounts, analytics or external runtime dependencies. Three.js 0.170.0, OrbitControls and SVGLoader are vendored under their [MIT license](site/vendor/THREE-LICENSE.txt). Their import paths use the local Three.js module. Open Sans is vendored under the [SIL Open Font License](site/vendor/fonts/OFL.txt).
 
 ## Run locally
 
@@ -50,10 +65,14 @@ GitHub Pages deploys the `site/` directory after every push to `main`, following
 | `site/design/` | Living visual reference with a working specimen using the actual printer model |
 | `site/models.js` | Procedural 3D geometry, animation, orbit controls and labels |
 | `site/app.js` | Controls, results, accounts, charts, requirements, comparison, sharing and CSV export |
+| `site/fabrication.js` | Machine profiles, G-code/DXF parsers, file-based physics and playback timing |
+| `site/fabrication-svg.js`, `site/fabrication-worker.js` | Local SVG import and background G-code/DXF parsing |
+| `site/examples/` | Synthetic fabrication files |
 | `site/style.css`, `site/lab.css` | Shared components and responsive lab layout |
 | `tests/physics.test.mjs` | Parameter bounds, conservation, scaling and numerical convergence checks |
 | `tests/engineering.test.mjs` | Conservation accounts, requirement equality and feasibility, input roles and applicability |
 | `tests/design.test.mjs` | Identity, contrast and asset-version checks |
+| `tests/fabrication.test.mjs` | Parser modes, units, extrusion, curves, envelopes, material comparisons and timing |
 
 Run `npm run tokens` after editing the design tokens. Tests reject CSS or 3D palettes that drift from the source tokens. Versioned stylesheet and module URLs keep an interface revision from mixing with cached assets from an older revision.
 
