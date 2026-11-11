@@ -199,7 +199,7 @@
   .lab .input-heading button { min-height: 34px; }
 }
 
-@media (max-width: 650px) and (min-height: 700px) {
+@media (max-width: 650px) and (min-height: 600px) {
   .live-evidence { position: sticky; z-index: 5; top: 0; padding-bottom: 4px; }
   .lab .inspector :is(button, input) { scroll-margin-top: 420px; }
 }

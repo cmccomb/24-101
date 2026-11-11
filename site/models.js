@@ -1,7 +1,7 @@
 import * as T from './vendor/three.module.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
-import {systems} from './systems.js?v=1.3.0';
-import {modelColors as C} from './theme.js?v=1.3.0';
+import {systems} from './systems.js?v=1.3.1';
+import {modelColors as C} from './theme.js?v=1.3.1';
 export function createViewer(host,onFailure){
  let renderer;try{renderer=new T.WebGLRenderer({antialias:true,alpha:true});}catch(e){onFailure(e);return null;}
  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(C.background,1);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;

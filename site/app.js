@@ -1,6 +1,6 @@
-import {systems, defaults, fmt} from './systems.js?v=1.3.0';
-import {lessons, engineering, requirement, perturbation} from './engineering.js?v=1.3.0';
-import {createViewer} from './models.js?v=1.3.0';
+import {systems, defaults, fmt} from './systems.js?v=1.3.1';
+import {lessons, engineering, requirement, perturbation} from './engineering.js?v=1.3.1';
+import {createViewer} from './models.js?v=1.3.1';
 
 const $=id=>document.getElementById(id);
 const connections={
@@ -208,6 +208,10 @@ $('system-list').addEventListener('click',e=>{const button=e.target.closest('[da
 $('system-select').addEventListener('change',e=>{location.hash=e.target.value;});
 $('parameters').addEventListener('input',e=>change(e.target));
 $('parameters').addEventListener('change',e=>change(e.target,true));
+$('parameters').addEventListener('focusout',e=>{
+  const input=e.target;
+  if(input.type==='number'&&input.valueAsNumber!==params[input.dataset.key])change(input,true);
+});
 const evidence=document.querySelector('.evidence');
 const switches=document.querySelectorAll('.evidence-switch button');
 for(const button of switches){
@@ -230,6 +234,7 @@ $('sweep-input').addEventListener('change',e=>{sweepKey=e.target.value;chart();s
 $('sweep-output').addEventListener('change',e=>{sweepIndex=Number(e.target.value);chart();showLocalResponse();});
 $('requirement-limit').addEventListener('input',e=>{const value=e.target.valueAsNumber;if(Number.isFinite(value)&&e.target.validity.valid){target=value;targets[current.id]=value;showRequirement();chart();}});
 $('requirement-limit').addEventListener('change',e=>{e.target.value=target;announce();});
+$('requirement-limit').addEventListener('blur',e=>{if(e.target.valueAsNumber!==target)e.target.value=target;});
 $('play').addEventListener('click',()=>{if(viewer){viewer.setPlaying(!viewer.playing);playbackLabel();}});
 $('camera').addEventListener('click',()=>viewer?.resetCamera(current.id));
 $('cutaway').addEventListener('change',e=>viewer?.setCutaway(e.target.checked));

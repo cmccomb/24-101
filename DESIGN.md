@@ -43,7 +43,7 @@ The [CMU core palette](https://brand.cmu.edu/node/) supplies Carnegie Red and co
 - Use the 4, 8, 12, 16, 24, 32, 48, 64 and 96 px spacing scale. Align related text, plots and diagrams before adding borders.
 - Square corners, thin rules and a white canvas. One strong red rule is more useful than repeated decorative containers.
 - Desktop: place the live results above the model, response plot and inputs. Fit all four results, the requirement, and all input controls at 1280 × 720. Keep the exercise, equations and conservation account in the page below.
-- Tablet: keep inputs beside the selected model or plot when there is room. Phone: use a system picker and one evidence view at a time. At heights of 700 px and up, pin the selected evidence and results while the student scrolls through inputs. Plot coordinates adapt to the available width.
+- Tablet: keep inputs beside the selected model or plot when there is room. Phone: use a system picker and one evidence view at a time. At heights of 600 px and up, pin the selected evidence and results while the student scrolls through inputs. Plot coordinates adapt to the available width.
 
 ## Diagram and plot grammar
 
