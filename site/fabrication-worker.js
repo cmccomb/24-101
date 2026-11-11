@@ -1,4 +1,4 @@
-import {parseGCode, parseDXF} from './fabrication.js?v=1.4.1';
+import {parseGCode, parseDXF} from './fabrication.js?v=1.4.2';
 
 self.onmessage = ({data}) => {
   try {

@@ -1,8 +1,8 @@
 import * as T from './vendor/three.module.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
-import {systems} from './systems.js?v=1.4.1';
-import {modelColors as C} from './theme.js?v=1.4.1';
-import {jobTimeline, laserMaterials} from './fabrication.js?v=1.4.1';
+import {systems} from './systems.js?v=1.4.2';
+import {modelColors as C} from './theme.js?v=1.4.2';
+import {jobTimeline, laserMaterials} from './fabrication.js?v=1.4.2';
 export function createViewer(host,onFailure,onJobProgress=()=>{}){
  let renderer;try{renderer=new T.WebGLRenderer({antialias:true,alpha:true});}catch(e){onFailure(e);return null;}
  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(C.background,1);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;
@@ -136,7 +136,7 @@ export function createViewer(host,onFailure,onJobProgress=()=>{}){
      if(jobPlayback.sheet){
        jobPlayback.sheet.material.color.setHex(laserMaterials[stock].color);
        jobPlayback.sheet.scale.y=p.thick/3.175;
-       jobPlayback.sheet.position.y=.6-.0125*jobPlayback.sheet.scale.y;
+       jobPlayback.sheet.position.y=.6-p.thick*jobPlayback.scale/2;
      }
      if(reset)resetCamera(job.kind);
      return;
@@ -170,9 +170,9 @@ export function createViewer(host,onFailure,onJobProgress=()=>{}){
      for(const x of [-1.95,1.95])box(.08,.13,3.03,C.steel,[x,.58,0]);
      const width=(job.bounds.max[0]-job.bounds.min[0])*scale,depth=(job.bounds.max[1]-job.bounds.min[1])*scale;
      const center=map(job.bounds.min.map((min,i)=>(min+job.bounds.max[i])/2));
-     sheet=box(Math.max(width,.02),.025,Math.max(depth,.02),laserMaterials[stock].color,[center.x,.5875,center.z]);
+     sheet=box(Math.max(width,.02),3.175*scale,Math.max(depth,.02),laserMaterials[stock].color,[center.x,.6-3.175*scale/2,center.z]);
      sheet.scale.y=p.thick/3.175;
-     sheet.position.y=.6-.0125*sheet.scale.y;
+     sheet.position.y=.6-p.thick*scale/2;
      box(3.85,.12,.14,C.steel,[0,.88,0],gantry);
      box(.22,.3,.24,C.red,[0,.77,0],head);
    }
@@ -196,11 +196,11 @@ export function createViewer(host,onFailure,onJobProgress=()=>{}){
    deposited.geometry.setDrawRange(0,0);
    const partial=makeLines([0,0,0,0,0,0],C.red,1);
    partial.frustumCulled=false;
-   const cursor=ball(.018,C.red,[0,0,0],bed||model);
+   const cursor=ball(printer?.008:.004,C.red,[0,0,0],bed||model);
    cursor.material.depthTest=false;
    cursor.renderOrder=3;
    const timeline=jobTimeline(job,p);
-   jobPlayback={job,timeline,timeFactor:printer?100/p.speed:1/p.speed,duration:timeline.at(-1).end,elapsed:0,sheet,map,bed,gantry,machineMode:false};
+   jobPlayback={job,timeline,timeFactor:printer?100/p.speed:1/p.speed,duration:timeline.at(-1).end,elapsed:0,sheet,map,scale,bed,gantry,machineMode:false};
    orbit.maxZoom=20;
    animate=()=>{
      const playback=jobPlayback;
