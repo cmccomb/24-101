@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>24-101 · Mechanical Engineering Systems</title>
   <meta name="description" content="Define a system boundary. Apply conservation laws. Change a design variable and test a requirement.">
-  <link rel="stylesheet" href="./tokens.css?v=1.2.0">
-  <link rel="stylesheet" href="./style.css?v=1.2.0">
+  <link rel="stylesheet" href="./tokens.css?v=1.3.0">
+  <link rel="stylesheet" href="./style.css?v=1.3.0">
+  <link rel="stylesheet" href="./lab.css?v=1.3.0">
 </head>
-<body>
+<body class="lab">
   <a class="skip" href="#main">Skip to system</a>
   <header class="site-header">
     <a class="course-title" href="#printer"><strong>24-101</strong><span>Fundamentals of Mechanical Engineering</span></a>
@@ -20,26 +21,58 @@
     </aside>
     <main id="main">
       <header class="lesson-heading">
+        <label class="system-picker">System <select id="system-select"></select></label>
         <p class="system-name"><span id="number">01</span><span id="system-name">3D printer</span></p>
         <h1 id="claim">Faster deposition requires more heating power.</h1>
-        <p id="problem"></p><p id="schedule" hidden></p>
       </header>
       <div class="workspace">
-        <figure class="model-figure">
-          <div id="viewport"><div id="loading" class="loading">Loading 3D model.</div></div>
-          <div class="model-tools"><button id="play" aria-label="Pause animation">Pause motion</button><button id="camera">Reset view</button><label><input id="cutaway" type="checkbox"> Transparent</label><span>Drag to rotate · scroll to zoom</span></div>
-          <figcaption>Schematic geometry and motion. Use the calculations for quantitative comparisons.</figcaption>
-        </figure>
-        <section class="inspector" aria-label="Design inputs and physics">
-          <div class="tabs" role="tablist" aria-label="System controls"><button id="tab-inputs" data-tab="inputs" role="tab" aria-selected="true" aria-controls="panel-inputs">Inputs</button><button id="tab-physics" data-tab="physics" role="tab" aria-selected="false" aria-controls="panel-physics" tabindex="-1">Physics</button></div>
-          <div id="panel-inputs" role="tabpanel" aria-labelledby="tab-inputs"><div class="panel-actions"><button id="reset" class="text-button">Restore default inputs</button></div><div id="parameters"></div></div>
-          <div id="panel-physics" role="tabpanel" aria-labelledby="tab-physics" hidden><p class="physics-topics" id="physics-topics"></p><div id="equations"></div><details class="assumptions"><summary>Assumptions and applicability</summary><p id="assumptions"></p></details><div class="course-connection"><h3>Connection to 33-141</h3><p id="physics-connection"></p><a href="https://coursecatalog.web.cmu.edu/schools-colleges/melloncollegeofscience/departmentofphysics/" target="_blank" rel="noopener">Physics course descriptions</a><h3>Later MechE courses</h3><p id="cmu"></p></div><details class="sources"><summary>References</summary><div id="sources"></div></details></div>
+        <div class="live-evidence">
+          <section class="results" aria-label="Calculated results">
+            <div id="metrics" class="metric-grid"></div>
+            <p id="validity" class="validity" hidden></p>
+            <p id="result-announcement" class="sr-only" role="status"></p>
+          </section>
+          <div class="evidence" data-view="model">
+            <div class="evidence-switch" role="group" aria-label="Evidence view">
+              <button type="button" data-view="model" aria-pressed="true" aria-controls="model-panel">3D model</button>
+              <button type="button" data-view="plot" aria-pressed="false" aria-controls="plot-panel">Response plot</button>
+            </div>
+            <figure class="model-figure" id="model-panel">
+              <div id="viewport"><div id="loading" class="loading">Loading 3D model.</div></div>
+              <div class="model-tools"><button id="play" aria-label="Pause animation">Pause motion</button><button id="camera">Reset view</button><label><input id="cutaway" type="checkbox"> Transparent</label></div>
+              <figcaption>Schematic geometry and motion</figcaption>
+            </figure>
+            <section class="parameter-study" id="plot-panel" aria-label="Response plot">
+              <div class="study-controls"><label>Vary <select id="sweep-input"></select></label><label>Measure <select id="sweep-output"></select></label></div>
+              <svg id="chart" viewBox="0 0 400 220" role="img" aria-label="Parameter study"></svg>
+              <p id="plot-note" class="plot-note" hidden></p>
+            </section>
+          </div>
+        </div>
+        <section class="inspector" aria-labelledby="input-title">
+          <div class="input-heading"><h2 id="input-title">Inputs</h2><button id="reset" class="text-button">Reset inputs</button><button id="baseline" class="text-button">Set reference</button></div>
+          <div id="parameters"></div>
+          <div class="requirement">
+            <label id="requirement-label" for="requirement-limit"></label>
+            <div class="requirement-input"><span id="requirement-relation"></span><input id="requirement-limit" type="number" min="0" max="1000000000" step="any" aria-describedby="requirement-relation requirement-unit requirement-status requirement-margin"><span id="requirement-unit"></span></div>
+            <p id="requirement-status"></p><p id="requirement-margin"></p>
+          </div>
         </section>
       </div>
-      <section class="results" aria-label="Calculated results">
-        <div class="section-heading"><h2>Calculated response</h2><button id="baseline" class="text-button">Use current inputs as reference</button></div>
-        <div id="metrics" class="metric-grid" aria-live="polite" aria-atomic="true"></div>
-        <p id="reference-inputs" class="reference-inputs"></p><p id="validity" class="validity" hidden></p>
+      <section class="lesson-details" aria-label="Design exercise and physics">
+        <h2>Test the claim</h2>
+        <p id="problem"></p><p id="prompt"></p><p id="schedule" hidden></p>
+        <p id="local-response"></p><p id="reference-inputs" class="reference-inputs"></p>
+        <button id="csv" class="text-button">Download plot data (CSV)</button>
+        <details class="physics" id="physics">
+          <summary>Physics and assumptions</summary>
+          <p class="physics-topics" id="physics-topics"></p>
+          <div id="equations"></div>
+          <p id="assumptions"></p>
+          <div class="input-definitions"><h3>Input definitions</h3><dl id="input-definitions"></dl></div>
+          <div class="course-connection"><h3>Connection to 33-141</h3><p id="physics-connection"></p><a href="https://coursecatalog.web.cmu.edu/schools-colleges/melloncollegeofscience/departmentofphysics/" target="_blank" rel="noopener">Physics course descriptions</a><h3>Later MechE courses</h3><p id="cmu"></p></div>
+          <div class="sources"><h3>References</h3><div id="sources"></div></div>
+        </details>
       </section>
       <section class="balance-section" aria-label="Conservation account">
         <div class="section-heading"><h2 id="balance-title">Energy balance</h2><span id="balance-unit"></span></div>
@@ -47,14 +80,10 @@
         <div class="balance-account"><div class="account-side"><h3 id="input-heading">Input</h3><div id="balance-input"></div></div><div class="system-boundary"><span>System boundary</span><p id="boundary"></p></div><div class="account-side"><h3 id="output-heading">Output and accumulation</h3><div id="balance-output"></div></div></div>
         <p id="residual" class="residual"></p><p id="interpretation" class="interpretation"></p><p id="balance-source" class="balance-source"></p>
       </section>
-      <section class="analysis" aria-label="Parameter study and design requirement">
-        <div class="parameter-study"><h2>Parameter study</h2><div class="study-controls"><label>Vary <select id="sweep-input"></select></label><label>Measure <select id="sweep-output"></select></label></div><p class="held-fixed">Other inputs are held at their current values.</p><svg id="chart" viewBox="0 0 760 320" role="img" aria-label="Parameter study"></svg><div class="chart-caption"><p id="local-response"></p><button id="csv" class="text-button">Download data (CSV)</button></div></div>
-        <aside class="design-task"><h2>Design requirement</h2><label id="requirement-label" for="requirement-limit"></label><div class="requirement-input"><span id="requirement-relation"></span><input id="requirement-limit" type="number" min="0" step="any" aria-describedby="requirement-context"><span id="requirement-unit"></span></div><p id="requirement-context">An editable requirement for this exercise.</p><p id="requirement-status" role="status"></p><p id="requirement-margin"></p><h3>Test the claim</h3><p id="prompt"></p></aside>
-      </section>
-      <footer><span>Chris McComb · Carnegie Mellon University</span><span>Teaching models. Assumptions and references are in the Physics tab.</span></footer>
+      <footer><span>Chris McComb · Carnegie Mellon University</span><span>24-101 teaching models</span></footer>
     </main>
   </div>
   <div id="toast" role="status"></div>
-  <script type="module" src="./app.js?v=1.2.0"></script>
+  <script type="module" src="./app.js?v=1.3.0"></script>
 </body>
 </html>

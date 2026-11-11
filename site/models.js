@@ -1,12 +1,12 @@
 import * as T from './vendor/three.module.js';
 import {OrbitControls} from './vendor/OrbitControls.js';
-import {systems} from './systems.js?v=1.2.0';
-import {modelColors as C} from './theme.js?v=1.2.0';
+import {systems} from './systems.js?v=1.3.0';
+import {modelColors as C} from './theme.js?v=1.3.0';
 export function createViewer(host,onFailure){
  let renderer;try{renderer=new T.WebGLRenderer({antialias:true,alpha:true});}catch(e){onFailure(e);return null;}
  renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(C.background,1);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;
  host.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','Interactive 3D system model. Drag to orbit, scroll to zoom.');renderer.domElement.setAttribute('role','img');
- const scene=new T.Scene();scene.fog=new T.Fog(C.background,14,35);const camera=new T.OrthographicCamera(-4,4,2.9,-2.9,.05,100);const orbit=new OrbitControls(camera,renderer.domElement);orbit.enableDamping=true;orbit.minZoom=.55;orbit.maxZoom=3;orbit.maxPolarAngle=Math.PI*.49;
+ const scene=new T.Scene();scene.fog=new T.Fog(C.background,14,35);const camera=new T.OrthographicCamera(-4,4,2.9,-2.9,.05,100);const orbit=new OrbitControls(camera,renderer.domElement);orbit.enableDamping=true;orbit.minZoom=.55;orbit.maxZoom=3;orbit.maxPolarAngle=Math.PI*.49;renderer.domElement.style.touchAction='pan-y';
  scene.add(new T.HemisphereLight(0xffffff,0x9da4a9,2));const key=new T.DirectionalLight(0xffffff,2.5);key.position.set(3,8,5);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-6;key.shadow.camera.right=6;key.shadow.camera.top=6;key.shadow.camera.bottom=-6;scene.add(key);const rim=new T.DirectionalLight(0xffffff,1.2);rim.position.set(-4,3,-4);scene.add(rim);
  const floor=new T.Mesh(new T.PlaneGeometry(100,100),new T.MeshStandardMaterial({color:C.background,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.03;floor.receiveShadow=true;scene.add(floor);const grid=new T.GridHelper(12,24,C.grid,C.grid);grid.position.y=-.02;scene.add(grid);
  let model=new T.Group(),animate=()=>{},labels=[],phase=0,last=0,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,rate=1,cut=false,frames=0;
@@ -25,7 +25,6 @@ export function createViewer(host,onFailure){
  function flow(points,color,count=10,speed=1,parent=model){let curve=new T.CatmullRomCurve3(points.map(p=>new T.Vector3(...p)));mesh(new T.TubeGeometry(curve,60,.035,8,false),color,[0,0,0],parent,{transparent:true,opacity:.48});let dots=Array.from({length:count},()=>ball(.055,color,[0,0,0],parent));return t=>dots.forEach((o,i)=>o.position.copy(curve.getPoint((t*speed*.12+i/count)%1)));}
  function boiler(pos=[0,0,0],parent=model){let g=group(pos,parent);cyl(.48,1.25,C.red,[0,.8,0],g);cyl(.49,.08,C.light,[0,1.45,0],g);box(1,.22,.9,C.dark,[0,.1,0],g);for(let i=0;i<5;i++)ring(.25,.025,C.red,[0,.65+i*.12,.42],g);return g;}
  function heatExchanger(pos,color,parent=model){let g=group(pos,parent);box(.9,1.25,.65,C.steel,[0,.75,0],g);for(let i=0;i<10;i++)box(.95,.035,.7,C.light,[0,.25+i*.11,0],g);return fan(.35,[0,.75,.42],g);}
- function shaft(pos,parent=model){let g=group(pos,parent);for(let i=0;i<3;i++){let rotor=fan(.36,[i*.2,0,0],g);rotor.rotation.y=Math.PI/2;}link([-.25,0,0],[.7,0,0],.05,C.light,g);return g;}
  function vehicle(race,p){let car=group([0,.48,0]);if(race){box(2.25,.23,.8,C.dark,[0,0,0],car);box(.8,.26,.68,C.steel,[-.45,.2,0],car);box(.65,.18,.35,C.light,[1,.1,0],car);box(.8,.5,.7,C.dark,[.2,.25,0],car);box(.6,.2,.75,C.steel,[-.75,.33,0],car);box(.14,.2,1.55,C.light,[1.35,-.05,0],car);box(.14,.32,1.5,C.steel,[-1.2,.45,0],car);link([-.4,.3,-.4],[.2,.75,-.4],.035,C.steel,car);link([-.4,.3,.4],[.2,.75,.4],.035,C.steel,car);}else{let body=mesh(new T.SphereGeometry(1,40,24),C.steel,[0,.12,0],car);body.scale.set(1.45,.34,.43);let visor=mesh(new T.SphereGeometry(1,24,16),C.dark,[.4,.25,0],car,{metalness:.1});visor.scale.set(.45,.19,.31);link([-1.2,.2,0],[-1.7,.65,0],.035,C.light,car);link([-1.7,.65,-.3],[-1.7,.65,.3],.035,C.light,car);}
  let wheels=[];const contacts=race?[[-.9,-.57],[-.9,.57],[.8,-.57],[.8,.57]]:[[-.9,-.57],[-.9,.57],[.8,0]];for(const [x,z] of contacts){wheels.push(wheel(race?.3:.19,[x,-.12,z],car));link([x,0,0],[x,-.12,z],.025,C.steel,car);}return{car,wheels};}
  function clear(){scene.remove(model);model.traverse(o=>{o.geometry?.dispose();if(o.material){[].concat(o.material).forEach(m=>m.dispose());}});model=new T.Group();scene.add(model);labels=[];host.querySelectorAll('.model-label').forEach(e=>e.remove());}
@@ -43,14 +42,24 @@ export function createViewer(host,onFailure){
    box(3.9,.35,2.7,C.dark,[0,.25,0]);for(let i=0;i<16;i++)box(3.5,.1,.04,C.steel,[0,.48,-1.15+i*.15]);box(2.9,p.thick*.018,.1+1.8,C.light,[0,.62,0]);let bridge=group([0,1.1,0]);box(3.7,.16,.2,C.steel,[0,0,0],bridge);for(let x of [-1.7,1.7])box(.18,.6,.3,C.steel,[x,-.25,0],bridge);let head=group([0,0,0],bridge);box(.3,.35,.3,C.red,[0,.05,0],head);let beam=cyl(.008+p.power*.00015,.28,C.red,[0,-.28,0],head);beam.material.emissive.set(C.red);beam.material.emissiveIntensity=2;let spot=ball(.04,C.orange,[0,-.42,0],head);spot.material.emissive.set(C.orange);for(let x of [-.8,0,.8]){let path=ring(.3,.008,C.dark,[x,.66,0]);path.rotation.x=Math.PI/2;}ticks.push(t=>{head.position.x=1.1*Math.sin(t*p.speed/12);bridge.position.z=.65*Math.cos(t*p.speed/17);spot.scale.setScalar(1+.3*Math.sin(t*20));});label('Focused beam',[.4,1.2,0]);label('Sheet + kerf',[-1,.65,.9]);
   }else if(id==='heatpump'){
    let left=heatExchanger([-1.35,0,0],C.blue),right=heatExchanger([1.35,0,0],C.red);let comp=cyl(.35,.65,C.dark,[0,.4,.2]);let f1=flow([[-1.35,1.2,.5],[-1.35,1.8,.5],[0,1.8,.5],[1.35,1.2,.5]],C.red,12,outputs[1].value/5);let f2=flow([[1.35,.3,.4],[1.35,.15,1],[0,.2,1],[-1.35,.3,.4]],C.blue,12,outputs[2].value/5);ticks.push(t=>{left.rotation.z=t*p.input*2;right.rotation.z=-t*p.input*2;f1(t);f2(t);});label('Cold side',[-1.4,1.8,0]);label('Hot side',[1.4,1.8,0]);label('Compressor',[0,.65,1]);
+  }else if(id==='refrigerator'){
+   const wall=.13+.24*(6-p.ua)/5;
+   box(1.58,2.72,1.1,C.light,[-.46,1.45,-.45]);
+   for(const x of [-1.24,.32])box(wall,2.72,1.4,C.steel,[x,1.45,.18]);
+   for(const y of [.18,2.72])box(1.65,wall,1.4,C.steel,[-.46,y,.18]);
+   for(const y of [.86,1.43,2])box(1.3,.04,1,C.light,[-.46,y,.19]);
+   cyl(.27,.42,C.dark,[.86,.4,-.13]);
+   const coldCoil=flow([[-.99,2.42,.59],[-.83,2.29,.59],[-.03,2.29,.59],[-.14,2.13,.59],[-.87,2.13,.59]],C.blue,8,outputs[1].value/130);
+   const hotCoil=flow([[.86,.63,-.13],[.81,1.62,.16],[1.41,1.88,.16],[1.41,1.4,.16],[.89,1.2,.16],[1.38,.95,.16],[1.38,.57,.16]],C.red,12,outputs[3].value/220);
+   const leak=flow([[-2,1.5,.9],[-1.46,1.48,.85],[-.8,1.5,.75]],C.red,5,outputs[0].value/50);
+   ticks.push(coldCoil,hotCoil,leak);
+   label('Evaporator',[-.45,2.58,.9]);label('Heat leak',[-1.32,1.4,1.1]);label('Condenser',[1.22,2.08,.29]);label('Compressor',[1,.37,.5]);
   }else if(id==='espresso'){
    box(2.1,.2,1.6,C.dark,[0,.1,0]);box(2,2.3,.6,C.steel,[0,1.35,-.5]);box(2.15,.2,1.3,C.light,[0,2.5,-.15]);boiler([-.55,.45,-.25]);cyl(.3,.2,C.dark,[.45,1.6,.35]);link([.45,1.55,.4],[1.25,1.55,.4],.065,C.dark);let cup=cyl(.3,.35,C.light,[.45,.5,.35]);cyl(.26,.02,0x51392c,[.45,.69,.35]);let stream=flow([[.45,1.45,.35],[.45,1,.35],[.45,.7,.35]],0xa56c42,9,p.pressure/9);let dial=ring(.17,.035,C.light,[.6,2.1,-.16]);let needle=box(.014,.14,.015,C.red,[.6,2.12,-.12]);needle.rotation.z=-p.pressure/12*Math.PI;let water=cyl(.28,.5*p.water/300,C.blue,[-.55,1,0]);ticks.push(stream);label('Heated boiler',[-.7,2,0]);label('Brew pressure',[.9,2.45,0]);label('Coffee flow',[.7,1,1]);
   }else if(id==='otto'){
    box(3.2,.3,1.6,C.dark,[0,.2,0]);link([-1.6,.65,0],[1.6,.65,0],.09,C.steel);for(let i=0;i<4;i++){let x=-1.1+i*.73;let housing=cyl(.29,1.25,C.steel,[x,1.7,0]);housing.material.transparent=true;housing.material.opacity=.25;let piston=cyl(.25,.17,C.light,[x,1.55,0]);let rod=link([x,.65,0],[x,1.5,0],.045,C.steel);let spark=ball(.13,C.orange,[x,2.3,0]);spark.material.emissive.set(C.orange);ticks.push(t=>{let a=t*p.rpm/450+i*Math.PI,py=1.55+.32*Math.cos(a),bot=new T.Vector3(x+.18*Math.sin(a),.65+.18*Math.cos(a),0),top=new T.Vector3(x,py,0);piston.position.y=py;rod.position.copy(bot.clone().add(top).multiplyScalar(.5));rod.scale.y=bot.distanceTo(top)/.85;rod.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),top.sub(bot).normalize());spark.scale.setScalar(.2+Math.max(0,Math.sin(a/2))**12);});box(.63,.16,.75,C.red,[x,2.35+(10-p.ratio)*.015,0]);}label('Piston + cylinder',[0,2.8,0]);label('Connecting rods',[1.1,1.05,.7]);label('Crankshaft',[-1,.6,.7]);
   }else if(id==='turbine'){
    let body=cyl(.63,3.5,C.steel,[0,1,0]);body.rotation.z=Math.PI/2;body.material.transparent=true;body.material.opacity=.18;for(let x of [-1.45,-1.1,-.75,.6,.95,1.3]){let f=fan(.52,[x,1,0]);f.rotation.y=Math.PI/2;ticks.push(t=>f.rotation.x=t*5*p.flow);}link([-2,1,0],[2,1,0],.055,C.light);let chamber=cyl(.45,.65,C.red,[0,1,0]);chamber.rotation.z=Math.PI/2;chamber.material.transparent=true;chamber.material.opacity=.5;let f=flow([[-2,1,0],[-1,1,0],[0,1,0],[1,1,0],[2.2,1,0]],C.orange,20,p.flow);ticks.push(f);for(let x of [-1,1])box(.25,.7,.8,C.dark,[x,.35,0]);label('Compressor',[-1.4,1.9,0]);label('Heat addition',[0,1.9,0]);label('Turbine',[1.4,1.9,0]);
-  }else if(id==='steam'){
-   boiler([-1.7,0,0]);let turbine=shaft([.2,.9,0]);let shell=cyl(.5,1.1,C.steel,[.45,.9,0]);shell.rotation.z=Math.PI/2;shell.material.transparent=true;shell.material.opacity=.25;let f1=flow([[-1.7,1.4,0],[-1.7,2.1,0],[.2,2.1,0],[.2,1,0]],C.red,15,p.input/50);let f2=flow([[.8,.9,0],[1.6,.9,.1],[1.6,.4,.8],[-1.7,.4,.8],[-1.7,.6,0]],C.blue,15,p.input/50);let fan1=heatExchanger([1.7,0,-.25],C.blue);ticks.push(t=>{turbine.rotation.x=t*p.input/10;fan1.rotation.z=t*2;f1(t);f2(t);});label('Boiler',[-1.7,1.8,.5]);label('Turbine shaft',[.4,1.5,.5]);label('Heat rejection',[1.7,1.9,.4]);
   }else if(id==='wind'){
    let r=1.25+.04*p.radius;cyl(.09,2.7,C.light,[0,1.35,0]);mesh(new T.ConeGeometry(.22,.65,20),C.light,[0,2.8,.1]).rotation.x=Math.PI/2;let rotor=group([0,2.7,.48]);for(let i=0;i<3;i++){let g=group([0,0,0],rotor);g.rotation.z=i*2*Math.PI/3;let blade=box(.15,r,.05,C.light,[.1,r/2,0],g);blade.rotation.z=-.13;}ball(.16,C.steel,[0,0,.04],rotor);ticks.push(t=>{rotor.rotation.z=-t*(6*p.wind/p.radius)*.18;});let wind=flow([[-2.4,1,1],[-.8,1,1],[1,1,1],[2.4,1,1]],C.blue,12,p.wind/8);ticks.push(wind);label('Swept rotor area',[1.3,3.5,.5]);label('Generator',[.2,2.5,-.4]);
   }else if(id==='solar'){
@@ -59,8 +68,56 @@ export function createViewer(host,onFailure){
    box(3.4,.15,2.25,C.dark,[0,.2,0]);let heat=outputs[2].value-20;let color=new T.Color(C.green).lerp(new T.Color(C.red),Math.min(Math.max(heat/60,0),1));for(let x=0;x<8;x++)for(let z=0;z<5;z++){let cell=cyl(.13,.55,color,[-1.4+x*.4,.56,-.85+z*.42]);cyl(.045,.035,C.light,[-1.4+x*.4,.855,-.85+z*.42]);}for(let z of [-1.08,1.08])link([-1.65,.35,z],[1.65,.35,z],.045,C.blue);let f=flow([[-1.7,.35,-1.1],[1.7,.35,-1.1],[1.7,.35,1.1],[-1.7,.35,1.1],[-1.7,.35,-1.1]],C.blue,20,p.ua/100);ticks.push(f);label('Cells · color at 20 min',[-.7,1.35,0]);label('Cooling loop',[1.5,.65,1.2]);
   }else if(id==='datacenter'){
    for(let i=0;i<3;i++){let x=-1.3+i*1.3;box(.95,2.1,.9,C.dark,[x,1.1,0]);for(let j=0;j<8;j++){box(.8,.17,.05,C.steel,[x,.3+j*.23,.48]);for(let k=0;k<3;k++)ball(.018,C.green,[x-.3+k*.12,.3+j*.23,.52]);}let cold=flow([[x,.2,1.5],[x,.9,.8],[x,1.2,0]],C.blue,8,p.flow/5),hot=flow([[x,1.2,0],[x,1.8,-1.1],[x,2.5,-1.2]],C.red,8,p.flow/5);ticks.push(cold,hot);}label('Cold supply aisle',[-1,1,1.5]);label('Hot exhaust aisle',[1,2.6,-.7]);
-  }else if(id==='fuelcell'){
-   let n=12,spacing=.11+p.cells/1600,side=Math.sqrt(p.area/250);for(let i=0;i<n;i++)box(.07,1.25*side,1.25*side,i%2?C.dark:C.steel,[(i-n/2)*spacing,1.1,0]);for(let y of [1.1-.6*side,1.1+.6*side])for(let z of [-.52*side,.52*side])link([-1.4,y,z],[1.4,y,z],.035,C.light);box(.14,1.5*side,1.5*side,C.light,[-1.45,1.1,0]);box(.14,1.5*side,1.5*side,C.light,[1.45,1.1,0]);let f=flow([[-2,.5,0],[-1.4,.5,0],[0,.5,0],[1.4,.5,0],[2,.3,.3]],C.blue,12,p.density);let current=flow([[-1.5,2.1,0],[-1.5,2.5,0],[1.5,2.5,0],[1.5,2.1,0]],C.dark,12,p.density);ticks.push(f,current);label('Hydrogen + air channels',[-.6,.4,.9]);label('Series cell stack',[0,2,.5]);label('Electric circuit',[0,2.8,0]);
+  }else if(id==='bicycle'){
+   const rear=-1.05,front=1.14,y=1.25,z=.45,pitch=.065;
+   const rearRadius=p.rear*pitch/(2*Math.PI),frontRadius=p.front*pitch/(2*Math.PI);
+   const wheelRadius=p.radius*3.35,rearWheel=wheel(wheelRadius,[rear,y,0]);
+   box(.075,.17,.08,C.red,[0,wheelRadius,0],rearWheel);
+   link([rear,y,0],[rear,y,z],.065,C.dark);
+   link([rear,y,-.13],[front,y,-.13],.065,C.steel);
+   link([rear,y,-.13],[.48,2.34,-.13],.055,C.steel);
+   link([front,y,-.13],[.48,2.34,-.13],.055,C.steel);
+   const sprocket=(x,r,teeth,color)=>{
+     const gear=group([x,y,z]);
+     ring(r,.026,color,[0,0,0],gear);
+     for(let i=0;i<teeth;i++){
+       const angle=i*2*Math.PI/teeth;
+       const tooth=box(.028,.038,.05,color,[r*Math.cos(angle),r*Math.sin(angle),0],gear);
+       tooth.rotation.z=angle;
+     }
+     for(let i=0;i<3;i++){
+       const angle=i*2*Math.PI/3;
+       link([0,0,0],[r*Math.cos(angle),r*Math.sin(angle),0],.024,color,gear);
+     }
+     return gear;
+   };
+   const cog=sprocket(rear,rearRadius,p.rear,C.steel),ringGear=sprocket(front,frontRadius,p.front,C.dark);
+   link([0,0,0],[0,-.55,.12],.045,C.steel,ringGear);
+   box(.23,.065,.2,C.dark,[0,-.55,.12],ringGear);
+
+   const tangent=Math.acos((rearRadius-frontRadius)/(front-rear));
+   const path=new T.Path();
+   path.moveTo(rear+rearRadius*Math.cos(tangent),y+rearRadius*Math.sin(tangent));
+   path.lineTo(front+frontRadius*Math.cos(tangent),y+frontRadius*Math.sin(tangent));
+   path.absarc(front,y,frontRadius,tangent,-tangent,true);
+   path.lineTo(rear+rearRadius*Math.cos(tangent),y-rearRadius*Math.sin(tangent));
+   path.absarc(rear,y,rearRadius,-tangent,tangent-2*Math.PI,true);
+   const length=path.getLength();
+   const rollers=Array.from({length:Math.round(length/pitch)},()=>box(.045,.032,.053,C.dark,[0,0,z]));
+   const crankSpeed=p.cadence*Math.PI/30*.22,wheelSpeed=outputs[0].value*Math.PI/30*.22;
+   ticks.push(t=>{
+     ringGear.rotation.z=-t*crankSpeed;
+     cog.rotation.z=rearWheel.rotation.z=-t*wheelSpeed;
+     rollers.forEach((roller,i)=>{
+       const position=(i/rollers.length+t*crankSpeed*frontRadius/length)%1;
+       const point=path.getPointAt(position),direction=path.getTangentAt(position);
+       roller.position.set(point.x,point.y,z);
+       roller.rotation.z=Math.atan2(direction.y,direction.x);
+     });
+   });
+   label(`${p.rear}T rear sprocket`,[rear,.69,.52]);
+   label(`${p.front}T chainring`,[front,1.98,.54]);
+   label('Rear wheel',[rear,2.58,.06]);
   }else if(id==='buggy'){
    let angle=Math.asin(p.height/p.length)*4;let ramp=group([0,.2+2.4*Math.sin(angle),0]);ramp.rotation.z=-angle;box(4.8,.12,1.8,C.steel,[0,0,0],ramp);let {car,wheels}=vehicle(false,p);model.remove(car);ramp.add(car);car.scale.multiplyScalar(.65);car.position.y=.24;let sin=p.height/p.length,a=9.81*(sin-p.crr*Math.sqrt(1-sin*sin)),b=.5*1.225*p.cda/p.mass,duration=outputs[1].value;ticks.push(t=>{let simulatedTime=(t%12)/12*duration,x=Math.log(Math.cosh(Math.sqrt(a*b)*simulatedTime))/b;car.position.x=3.5*x/p.length-1.75;wheels.forEach(w=>w.rotation.z=-x/.19*.02);});label('Freeroll · no motor',[.1,ramp.position.y+1,0]);label('Exaggerated slope',[-1.3,.25,1]);
   }else if(id==='racecar'){
@@ -68,10 +125,10 @@ export function createViewer(host,onFailure){
   }
   model.traverse(o=>{if(o.isMesh&&o.material){o.userData.baseOpacity=o.material.opacity;o.userData.baseTransparent=o.material.transparent;}});
   labels.forEach(l=>{l.el=document.createElement('span');l.el.className='model-label';l.el.textContent=l.text;host.append(l.el);});animate=t=>ticks.forEach(f=>f(t));if(reset)resetCamera(id);setCutaway(cut);animate(phase);}
- function resetCamera(id){camera.position.set(id==='wind'?5:5.4,id==='wind'?3.2:4.1,id==='wind'?7.5:6.4);camera.zoom=1;camera.updateProjectionMatrix();orbit.target.set(0,id==='wind'?1.8:1.25,0);orbit.update();}
+ function resetCamera(id){const bicycle=id==='bicycle';camera.position.set(bicycle?2.2:id==='wind'?5:5.4,bicycle?2.7:id==='wind'?3.2:4.1,bicycle?8:id==='wind'?7.5:6.4);camera.zoom=1;camera.updateProjectionMatrix();orbit.target.set(0,id==='wind'?1.8:1.25,0);orbit.update();}
  function setCutaway(value){cut=value;model.traverse(o=>{if(o.isMesh&&o.material){o.material.opacity=cut?Math.min(o.userData.baseOpacity,.32):o.userData.baseOpacity;o.material.transparent=cut||o.userData.baseTransparent;o.material.depthWrite=!cut;}});}
- const observer=new ResizeObserver(()=>{let w=Math.max(host.clientWidth,1),h=Math.max(host.clientHeight,1);renderer.setSize(w,h);camera.left=-2.9*w/h;camera.right=2.9*w/h;camera.top=2.9;camera.bottom=-2.9;camera.updateProjectionMatrix();});observer.observe(host);
- let raf;function render(now){let dt=Math.min((now-last)/1000,.05);last=now;if(playing)phase+=dt*rate;animate(phase);orbit.update();let rect=host.getBoundingClientRect();labels.forEach(l=>{let v=l.pos.clone().project(camera);l.el.style.left=`${(v.x+1)*rect.width/2}px`;l.el.style.top=`${(-v.y+1)*rect.height/2}px`;l.el.style.display=v.z<1?'':'none';});renderer.render(scene,camera);frames++;raf=requestAnimationFrame(render);}raf=requestAnimationFrame(render);
+ const observer=new ResizeObserver(()=>{const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h);const extent=Math.max(2.2,2.25*h/w);camera.left=-extent*w/h;camera.right=extent*w/h;camera.top=extent;camera.bottom=-extent;camera.updateProjectionMatrix();});observer.observe(host);
+ let raf;function render(now){let dt=Math.min((now-last)/1000,.05);last=now;const rect=host.getBoundingClientRect();if(!rect.width||!rect.height){raf=requestAnimationFrame(render);return;}if(playing)phase+=dt*rate;animate(phase);orbit.update();labels.forEach(l=>{let v=l.pos.clone().project(camera);l.el.style.left=`${(v.x+1)*rect.width/2}px`;l.el.style.top=`${(-v.y+1)*rect.height/2}px`;l.el.style.display=v.z<1?'':'none';});renderer.render(scene,camera);frames++;raf=requestAnimationFrame(render);}raf=requestAnimationFrame(render);
  renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();onFailure(new Error('Graphics context lost. Reload this page to restore the model.'));});
  return{build,resetCamera,setCutaway,setPlaying:v=>playing=v,setRate:v=>rate=v,get playing(){return playing;},get frames(){return frames;},dispose(){cancelAnimationFrame(raf);observer.disconnect();clear();orbit.dispose();renderer.dispose();}};
 }

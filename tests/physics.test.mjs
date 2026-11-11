@@ -10,13 +10,21 @@ close(val('laser',0,{power:120}),2*val('laser',0));close(val('laser',3,{thick:6}
 close(val('heatpump',1)-val('heatpump',2),defaults(get('heatpump')).input);assert.ok(val('heatpump',0)<val('heatpump',3));
 close(val('otto',2)*4*2500/120/1000,val('otto',1));close(val('otto',1)+val('otto',3),850*4*2500/120/1000);
 close(val('turbine',2)-val('turbine',1),val('turbine',0));close(val('turbine',3),100*(1-10**(-2/7)));
-close(val('steam',0)+val('steam',1),50);close(val('steam',1)*1e6/(4180*10),val('steam',3));
 close(val('wind',0,{wind:16}),8*val('wind',0));close(val('wind',0,{radius:12}),4*val('wind',0));
 close(val('battery',1,{power:100})/val('battery',1,{power:50}),4);assert.ok(val('battery',2)<val('battery',3));
 close(val('datacenter',2,{flow:10}),8*val('datacenter',2));close(val('datacenter',1,{flow:10}),val('datacenter',1)/2);
-close(val('fuelcell',0)+val('fuelcell',2),val('fuelcell',1)/3600*120e6/1000);assert.ok(val('fuelcell',3)<100);
 assert.ok(val('buggy',2)<=100);assert.ok(val('buggy',0,{cda:.05})>val('buggy',0,{cda:.25}));assert.ok(val('buggy',0,{mass:140})>val('buggy',0,{mass:70}));
 assert.ok(val('racecar',0,{power:100})<val('racecar',0,{power:20}));assert.ok(val('racecar',0,{mass:220})<val('racecar',0,{mass:380}));close(val('racecar',3),.5*300*(80/3.6)**2/1000);
 // Independent fine-step solver resolves the remaining numerical integration risk.
 function raceTime(dt){let v=0,t=0;while(v<80/3.6&&t<120){let F=Math.min(1.3*300*9.81,60000/Math.max(v,.1))-.015*300*9.81-.5*1.225*.9*v*v;v+=F/300*dt;t+=dt;}return t;}assert.ok(Math.abs(val('racecar',0)-raceTime(.001))<.02);
+close(val('bicycle',0),175);
+close(val('bicycle',1,{rear:36}),2*val('bicycle',1));
+close(val('bicycle',0,{rear:36}),.5*val('bicycle',0));
+close(val('bicycle',3,{rear:36}),val('bicycle',3));
+close(val('bicycle',2),175*Math.PI/30*.34*3.6);
+close(val('refrigerator',0),50);
+close(val('refrigerator',3),val('refrigerator',1)+90);
+close(val('refrigerator',2,{ua:5}),2*val('refrigerator',2));
+assert.ok(val('refrigerator',2,{room:35})>val('refrigerator',2,{room:15}));
+assert.ok(val('refrigerator',2,{room:35,ua:6,power:40})>100);
 console.log(`Passed ${checked} parameter configurations across all 14 systems, conservation/scaling checks and EV integration convergence.`);

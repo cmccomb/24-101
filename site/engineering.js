@@ -25,6 +25,14 @@ export const lessons = {
     sweep: ['outside', 1], roles: {outside:'Boundary condition',inside:'Boundary condition',input:'Operating condition',fraction:'Model assumption'},
     interpretation: 'COP is a heat-transfer ratio. The delivered heat includes both electrical input and energy extracted from outdoors. The Carnot calculation uses kelvin.'
   },
+  refrigerator: {
+    claim: 'A colder cabinet needs the compressor to run longer.',
+    problem: 'Size cooling capacity to hold a cabinet setpoint in a warm room.',
+    boundary: 'Refrigeration circuit while the compressor is running', balance: 'Q̇room = Q̇cold + Pelectric', kind: 'Power balance', unit: 'W',
+    criterion: {metric: 2, sense: 'max', target: 100, maxTarget: 100, label: 'Maximum compressor duty'},
+    sweep: ['room', 2], roles: {setpoint:'Operating target',room:'Boundary condition',ua:'Cabinet design',power:'Design capacity'},
+    interpretation: 'A warmer room increases heat leaking into the cabinet and lowers cooling COP. The compressor can hold the setpoint only if its on-cycle capacity equals or exceeds the heat leak.'
+  },
   espresso: {
     claim: 'Heating the water and boiler sets the warm-up time.',
     problem: 'Reach brewing temperature within a specified warm-up time.',
@@ -48,14 +56,6 @@ export const lessons = {
     criterion: {metric: 0, sense: 'min', target: 250, label: 'Required net shaft power'},
     sweep: ['ratio', 0], roles: {ratio:'Design choice',hot:'Boundary condition',flow:'Operating condition'},
     interpretation: 'At fixed inlet and maximum temperatures, the pressure ratio for maximum net power differs from the pressure ratio for maximum efficiency.'
-  },
-  steam: {
-    claim: 'A heat engine must reject part of its heat input.',
-    problem: 'Produce shaft power while accounting for the cooling demand.',
-    boundary: 'Heat engine between two reservoirs', balance: 'Q̇in = Pshaft + Q̇out', kind: 'Energy rate', unit: 'MW',
-    criterion: {metric: 0, sense: 'min', target: 20, label: 'Required shaft power'},
-    sweep: ['hot', 0], roles: {hot:'Boundary condition',cold:'Boundary condition',input:'Design capacity',fraction:'Model assumption'},
-    interpretation: 'This is a heat-engine balance illustrated by a steam plant. The fraction of Carnot efficiency is prescribed. A Rankine-cycle design requires steam properties and component models.'
   },
   wind: {
     claim: 'Wind power scales with swept area and wind speed cubed.',
@@ -89,13 +89,13 @@ export const lessons = {
     sweep: ['flow', 0], roles: {load:'Operating condition',flow:'Operating condition',supply:'Boundary condition'},
     interpretation: 'The rack heat balance and fan system curve are separate models. Their intersection defines the tradeoff between exhaust temperature and fan energy.'
   },
-  fuelcell: {
-    claim: 'A fuel cell divides fuel energy between electrical work and remaining energy.',
-    problem: 'Meet an electrical load and account for fuel use and residual energy.',
-    boundary: 'Fuel-cell stack on a hydrogen lower-heating-value basis', balance: 'ṁH₂ LHV = Pelectric + Presidual', kind: 'Energy rate', unit: 'kW',
-    criterion: {metric: 0, sense: 'min', target: 10, label: 'Required electrical output'},
-    sweep: ['cells', 0], roles: {cells:'Geometry',area:'Geometry',density:'Operating condition',voltage:'Operating assumption'},
-    interpretation: 'Cell count scales power and fuel consumption together. Cell voltage determines the electrical efficiency on this ideal LHV basis. Current density and voltage are prescribed independently.'
+  bicycle: {
+    claim: 'A larger rear sprocket trades wheel speed for torque.',
+    problem: 'Choose sprocket sizes that meet a hub torque requirement at a given crank torque.',
+    boundary: 'Crank, chain and engaged rear hub at steady cadence', balance: 'τcrank ωcrank = τhub ωwheel', kind: 'Power balance', unit: 'W',
+    criterion: {metric: 1, sense: 'min', target: 18, label: 'Required hub torque'},
+    sweep: ['rear', 1], roles: {front:'Gear selection',rear:'Gear selection',cadence:'Operating condition',torque:'Rider input',radius:'Wheel geometry'},
+    interpretation: 'At fixed crank torque and cadence, lowering the ratio increases hub torque by the same factor it decreases hub angular speed. Their product remains constant in the lossless model.'
   },
   buggy: {
     claim: 'A heavier buggy can lose a smaller fraction of its energy to drag.',
@@ -122,15 +122,15 @@ export function engineering(s,p,r=s.calc(p)) {
     case 'printer': input=[term('Heater demand',m[2])];output=[term('Filament heating',m[1]),term('Ambient loss',.08*(p.temp-25))];break;
     case 'laser': input=[term('Incident optical power',p.power)];output=[term('Absorbed by sheet',.7*p.power),term('Unabsorbed',.3*p.power)];break;
     case 'heatpump': input=[term('Compressor input',p.input),term('Heat from outdoors',m[2])];output=[term('Heat to room',m[1])];break;
+    case 'refrigerator': input=[term('Heat absorbed at evaporator',m[1]),term('Compressor electrical input',p.power)];output=[term('Heat rejected to room',m[3])];break;
     case 'espresso':{let d=p.temp-20,qw=p.water/1000*4180*d/1000,qb=.2*900*d/1000;input=[term('Electrical energy',(qw+qb)/.8)];output=[term('Water energy increase',qw,true),term('Boiler energy increase',qb,true),term('Assumed losses',(qw+qb)*.25)];break;}
     case 'otto': input=[term('Heat per firing',p.heat)];output=[term('Net cycle work',m[2]),term('Heat rejected',p.heat-m[2])];break;
     case 'turbine':{let k=p.ratio**(2/7),qin=p.flow*1.005*(p.hot-288*k),qout=p.flow*1.005*(p.hot/k-288);input=[term('Heat addition',qin)];output=[term('Net shaft power',m[0]),term('Heat rejection',qout)];break;}
-    case 'steam': input=[term('Heat input',p.input)];output=[term('Shaft power',m[0]),term('Heat rejection',m[1])];break;
     case 'wind':{let raw=.5*1.225*Math.PI*p.radius**2*p.wind**3/1000,shaft=raw*p.cp;input=[term('Free-stream power',raw)];output=[term('Electrical output',m[0]),term('Generator loss',shaft-m[0]),term('Uncaptured flow energy',raw-shaft)];break;}
     case 'solar':{let q=.65*p.area*p.sun/1000,loss=p.ua*(m[1]-20)/1000;input=[term('Collected solar heat',q)];output=[term('Heat loss',loss),term('Rate of energy storage',q-loss,true)];break;}
     case 'battery':{let cooling=p.ua*(m[2]-p.ambient)/1000;input=[term('Resistive heating',m[1])];output=[term('Cooling rate',cooling),term('Rate of energy storage',m[1]-cooling,true)];break;}
     case 'datacenter':input=[term('IT electrical power',p.load)];output=[term('Heat carried by air',1.2*p.flow*1005*m[1]/1000)];break;
-    case 'fuelcell':input=[term('Hydrogen energy (LHV)',m[1]/3600*120e6/1000)];output=[term('Electrical output',m[0]),term('Remaining energy',m[2])];break;
+    case 'bicycle': input=[term('Crank input',p.torque*p.cadence*Math.PI/30)];output=[term('Hub output',m[1]*m[0]*Math.PI/30)];break;
     case 'buggy':{let energy=p.mass*9.81*p.height/1000,kinetic=.5*p.mass*(m[0]/3.6)**2/1000,roll=p.crr*p.mass*9.81*Math.sqrt(1-(p.height/p.length)**2)*p.length/1000;input=[term('Gravitational energy',energy)];output=[term('Final kinetic energy',kinetic,true),term('Rolling loss',roll),term('Aerodynamic loss',energy-kinetic-roll)];break;}
     case 'racecar':{let v=80/3.6,drive=Math.min(p.grip*p.mass*9.81,p.power*1000/v),roll=.015*p.mass*9.81,drag=.5*1.225*p.cda*v*v;input=[term('Driving force',drive)];output=[term('Rolling resistance',roll),term('Aerodynamic drag',drag),term('Momentum-change rate (ma)',drive-roll-drag,true)];break;}
   }
@@ -141,4 +141,4 @@ export function engineering(s,p,r=s.calc(p)) {
 
 export function requirement(s,r,target,valid=true){const c=lessons[s.id].criterion,actual=r.metrics[c.metric].value;return{...c,target,actual,met:valid&&(c.sense==='max'?actual<=target:actual>=target),valid,unit:r.metrics[c.metric].unit,margin:c.sense==='max'?target-actual:actual-target};}
 
-export function perturbation(s,p,key,index){const def=s.params.find(v=>v.key===key),base=p[key],wanted=base*1.1;let next=Math.min(def.max,Math.max(def.min,wanted));if(Math.abs(next-base)<1e-10)next=Math.max(def.min,base*.9);if(Math.abs(base)<1e-10)next=Math.min(def.max,base+.1*(def.max-def.min));const before=s.calc(p).metrics[index].value,after=s.calc({...p,[key]:next}).metrics[index].value;return{from:base,to:next,inputPercent:base?100*(next-base)/Math.abs(base):null,before,after,outputPercent:before?100*(after-before)/Math.abs(before):null};}
+export function perturbation(s,p,key,index){const def=s.params.find(v=>v.key===key),base=p[key],wanted=base*1.1;let next=Math.min(def.max,Math.max(def.min,wanted));if(Math.abs(next-base)<1e-10)next=Math.max(def.min,base*.9);if(Math.abs(base)<1e-10)next=Math.min(def.max,base+.1*(def.max-def.min));if(def.integer)next=Math.round(next);const before=s.calc(p).metrics[index].value,after=s.calc({...p,[key]:next}).metrics[index].value;return{from:base,to:next,inputPercent:base?100*(next-base)/Math.abs(base):null,before,after,outputPercent:before?100*(after-before)/Math.abs(before):null};}

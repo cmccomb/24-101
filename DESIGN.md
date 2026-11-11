@@ -42,7 +42,8 @@ The [CMU core palette](https://brand.cmu.edu/node/) supplies Carnegie Red and co
 - Section heading: 18 px, semibold. Body and controls: 14 px. Labels: 12 px. Captions and provenance: at least 11 px in the shared design system.
 - Use the 4, 8, 12, 16, 24, 32, 48, 64 and 96 px spacing scale. Align related text, plots and diagrams before adding borders.
 - Square corners, thin rules and a white canvas. One strong red rule is more useful than repeated decorative containers.
-- Desktop: a narrow system index, a dominant model, and adjacent inputs. Tablet: model above controls. Phone: horizontal system index and a single column. Plot coordinates adapt to available width so axis labels remain readable.
+- Desktop: place the live results above the model, response plot and inputs. Fit all four results, the requirement, and all input controls at 1280 × 720. Keep the exercise, equations and conservation account in the page below.
+- Tablet: keep inputs beside the selected model or plot when there is room. Phone: use a system picker and one evidence view at a time. At heights of 700 px and up, pin the selected evidence and results while the student scrolls through inputs. Plot coordinates adapt to the available width.
 
 ## Diagram and plot grammar
 
@@ -56,7 +57,7 @@ The [CMU core palette](https://brand.cmu.edu/node/) supplies Carnegie Red and co
 | Extrapolation | Dashed gray curve plus an explicit applicability message |
 | Accumulation | Blue numerical term, explicitly named as stored energy or momentum change |
 
-Put axis labels and units on the plot. Expose the controlled and varied quantities. Do not infer physical validity from a closed numerical balance. Do not use scaled widths, areas or motion rates unless their quantitative meaning is specified.
+Put axis labels and units on the plot. Expose the controlled and varied quantities. Size the plot to the calculated response and state when a requirement is outside that range. Do not infer physical validity from a closed numerical balance. Do not use scaled widths, areas or motion rates unless their quantitative meaning is specified.
 
 ## Components and motion
 
@@ -69,5 +70,3 @@ Use motion to explain a mechanism or transport process. Avoid automatic camera o
 `design/tokens.json` is the source of truth for colors, type, spacing, layout and feedback timing. Run `npm run tokens` to generate `site/tokens.css` and the Three.js palette in `site/theme.js`. `npm test` verifies that generated files match the token source and checks text/figure contrast alongside the physics and engineering accounts.
 
 The [living reference](https://cmccomb.com/24-101/design/) uses the same generated tokens, identity lockup and components as the lab. Its sample results are calculated from the actual printer model. Future visual changes should update the reference and the lab together.
-
-Browser rendering remains unreviewed in the authoring environment. Token, contrast, DOM and geometry checks are evidence of implementation consistency, not visual signoff.

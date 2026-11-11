@@ -1,0 +1,205 @@
+.lab .site-header {
+  padding: 10px 24px;
+  gap: 12px;
+}
+
+.lab .course-title strong { white-space: nowrap; }
+.lab .page { grid-template-columns: 178px minmax(0, 1fr); }
+.lab .sidebar { padding: 18px 8px 16px 12px; }
+.lab .sidebar h2 { margin-bottom: 2px; }
+.lab .nav-group { padding: 10px 8px 3px; }
+.lab .nav-item { min-height: 32px; padding: 6px; }
+.lab main { padding: 18px 24px 0; }
+.lab .lesson-heading { max-width: none; margin-bottom: 14px; }
+.lab .system-name { margin-bottom: 5px; }
+.lab h1 { margin: 0; font-size: clamp(24px, 2.25vw, 36px); line-height: 1.2; }
+.system-picker { display: none; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.live-evidence { display: contents; }
+.lab .results { grid-column: 1 / -1; padding: 0; }
+.lab .metric { padding: 8px 12px; }
+.lab .metric-label { min-height: 0; line-height: 1.4; }
+.lab .metric-value {
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: 1.15;
+  margin: 3px 0;
+}
+.lab .metric-reference { line-height: 1.4; }
+.lab .metric-delta { margin-left: 7px; }
+.lab .validity { margin: 6px 0 0; font-size: 11px; line-height: 1.4; }
+
+.lab .workspace {
+  grid-template-columns: minmax(0, 1fr) minmax(272px, 26%);
+  gap: 16px;
+}
+.evidence {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  min-width: 0;
+}
+.evidence-switch { display: none; }
+.lab #viewport { height: clamp(220px, 38vh, 330px); }
+.lab .model-tools { padding: 2px 0; gap: 2px 12px; }
+.lab .model-tools :is(button, label) { min-height: 32px; }
+.lab figcaption { margin: 0; }
+
+.lab .parameter-study { min-width: 0; }
+.lab .study-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 8px;
+}
+.lab .study-controls label { display: grid; width: auto; margin: 0; gap: 2px; }
+.lab :is(.study-controls, .system-picker) select {
+  min-width: 0;
+  width: 100%;
+  max-width: none;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 5px 4px;
+  min-height: 30px;
+}
+.lab #chart { height: 210px; overflow: hidden; }
+.lab .chart-axis-label { font-size: 11px; }
+.plot-note { margin: 3px 0 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+
+.lab .inspector {
+  max-height: none;
+  overflow: visible;
+  padding: 0 0 0 12px;
+  border-left: 1px solid var(--line);
+}
+.lab .input-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+.lab .input-heading h2 { margin-right: auto; font-size: 15px; }
+.lab .input-heading button { white-space: nowrap; }
+.lab .parameter { margin: 0; padding: 3px 0; border-top: 1px solid var(--line); }
+.lab .param-head label { line-height: 1.25; }
+.lab .param-value input { width: 66px; min-height: 26px; padding: 0 5px; }
+.lab .param-unit { min-width: 22px; }
+.lab .range { display: block; height: 24px; margin: 0; }
+.lab .range:focus-visible { outline-offset: 1px; }
+.lab .requirement {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 8px;
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.lab .requirement label { font-size: 12px; font-weight: 600; line-height: 1.3; }
+.lab .requirement-input { margin: 0; gap: 4px; color: var(--blue); }
+.lab .requirement-input input { width: 75px; padding: 1px 5px; font-size: 14px; min-height: 28px; }
+.lab #requirement-status { margin: 0; font-size: 12px; line-height: 1.4; }
+.lab #requirement-margin { text-align: right; }
+
+.lesson-details { padding: 20px 0; margin-top: 20px; border-top: 1px solid var(--line); }
+.lesson-details h2 { margin-bottom: 8px; }
+.lesson-details #prompt { margin-top: 6px; }
+.lesson-details #local-response { margin: 12px 0 0; font-size: 12px; }
+.lesson-details .physics { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.physics summary { cursor: pointer; font-weight: 600; }
+.input-definitions dt { font-size: 12px; font-weight: 600; }
+.input-definitions dd { margin: 2px 0 8px; font-size: 12px; color: var(--muted); }
+
+@media (max-width: 1179px) {
+  .lab .page { display: block; }
+  .lab .sidebar, .lab .system-name { display: none; }
+  .system-picker {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .lab .system-picker select { width: auto; max-width: min(275px, 72vw); color: var(--ink); }
+}
+
+@media (min-width: 651px) and (max-width: 980px) {
+  .lab .metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .lab .metric:nth-child(n) { border-top: 0; }
+  .lab .metric:nth-child(3) { border-left: 1px solid var(--line); }
+}
+
+@media (max-width: 969px) {
+  .evidence { display: block; }
+  .evidence-switch {
+    display: flex;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 6px;
+    gap: 16px;
+  }
+  .evidence-switch button {
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    padding: 4px 2px;
+    min-height: 32px;
+    font-size: 12px;
+  }
+  .evidence-switch button[aria-pressed="true"] { border-color: var(--red); color: var(--red); font-weight: 600; }
+  .evidence[data-view="model"] #plot-panel,
+  .evidence[data-view="plot"] #model-panel { display: none; }
+}
+
+@media (max-width: 650px) {
+  .lab .site-header { padding: 6px 12px; }
+  .lab .course-title span { display: none; }
+  .lab .header-links .text-button { max-width: none; }
+  .lab main { padding: 10px 12px 0; }
+  .lab .lesson-heading { margin-bottom: 8px; }
+  .lab .system-picker select { min-height: 32px; }
+  .lab h1 { font-size: 22px; }
+  .live-evidence { display: block; background: var(--paper); }
+  .lab .results { margin-bottom: 6px; }
+  .lab .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lab .metric { padding: 4px 8px; }
+  .lab .metric-value { margin: 2px 0; font-size: 20px; }
+  .lab .metric-value small { font-size: 11px; }
+  .lab .metric-reference { font-size: 10px; }
+  .lab .validity { padding: 4px 8px; margin: 0; }
+  .lab .workspace { display: block; }
+  .lab #viewport { height: clamp(150px, 19vh, 185px); }
+  .lab #chart { height: 156px; }
+  .lab .model-tools { justify-content: space-between; }
+  .lab .inspector { margin-top: 8px; padding: 0; border-left: 0; }
+  .lab .parameter {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 10px;
+  }
+  .lab .param-head { display: contents; }
+  .lab .param-value { grid-column: 2; grid-row: 1 / span 2; }
+  .lab .param-value input { min-height: 32px; font-size: 16px; }
+  .lab .range { grid-column: 1; height: 26px; }
+  .lab .study-controls select { font-size: 12px; }
+  .lab .requirement-input input { min-height: 32px; font-size: 16px; }
+  .lab .input-heading button { min-height: 34px; }
+}
+
+@media (max-width: 650px) and (min-height: 700px) {
+  .live-evidence { position: sticky; z-index: 5; top: 0; padding-bottom: 4px; }
+  .lab .inspector :is(button, input) { scroll-margin-top: 420px; }
+}
