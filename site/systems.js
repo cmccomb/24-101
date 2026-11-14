@@ -1,5 +1,5 @@
-import {coreSystems} from './core-systems.js?v=1.6.2';
-import {weeks} from './course.js?v=1.6.2';
+import {coreSystems} from './core-systems.js?v=1.6.3';
+import {weeks} from './course.js?v=1.6.3';
 // SI units inside all calculations; UI units converted explicitly at the boundary.
 const therm='https://openstax.org/books/university-physics-volume-2/pages/4-key-equations';
 const mech='https://openstax.org/books/university-physics-volume-1/pages/8-3-conservation-of-energy';

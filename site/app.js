@@ -1,9 +1,9 @@
-import {visualGuides} from './physics-models.js?v=1.6.2';
-import {weekFor, dateLabel, areas} from './course.js?v=1.6.2';
-import {systems, extraSystems, allSystems, defaults, fmt} from './systems.js?v=1.6.2';
-import {lessons, lessonFor, engineering, requirement, perturbation} from './engineering.js?v=1.6.2';
-import {machines, laserMaterials, maxFileBytes, jobSystem, finishJob} from './fabrication.js?v=1.6.2';
-import {createViewer} from './models.js?v=1.6.2';
+import {visualGuides} from './physics-models.js?v=1.6.3';
+import {weekFor, dateLabel, areas} from './course.js?v=1.6.3';
+import {systems, extraSystems, allSystems, defaults, fmt} from './systems.js?v=1.6.3';
+import {lessons, lessonFor, engineering, requirement, perturbation} from './engineering.js?v=1.6.3';
+import {machines, laserMaterials, maxFileBytes, jobSystem, finishJob} from './fabrication.js?v=1.6.3';
+import {createViewer} from './models.js?v=1.6.3';
 
 const $=id=>document.getElementById(id);
 const exampleParts={
@@ -315,7 +315,7 @@ function showJobProgress(progress,elapsed,duration,height){
 }
 function parseInWorker(text,kind){
   parserWorker?.terminate();
-  const worker=new Worker(new URL('./fabrication-worker.js?v=1.6.2',import.meta.url),{type:'module'});
+  const worker=new Worker(new URL('./fabrication-worker.js?v=1.6.3',import.meta.url),{type:'module'});
   parserWorker=worker;
   return new Promise((resolve,reject)=>{
     worker.onmessage=({data})=>{worker.terminate();if(parserWorker===worker)parserWorker=null;data.error?reject(new Error(data.error)):resolve(data.job);};
@@ -338,7 +338,7 @@ async function loadJob(file,id=current.id,exampleFile=null){
     let job;
     if(extension==='svg'){
       if(file.size>2*1024*1024)throw new Error('Simplify the SVG to under 2 MB before previewing.');
-      const {parseSVG}=await import('./fabrication-svg.js?v=1.6.2');
+      const {parseSVG}=await import('./fabrication-svg.js?v=1.6.3');
       job=parseSVG(text);
     }else job=await parseInWorker(text,id);
     if(sequence!==loadSequence)return;

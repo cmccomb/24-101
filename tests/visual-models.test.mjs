@@ -38,6 +38,9 @@ for(const [id,name] of [['robot','payload-weight'],['quadcopter','vehicle-weight
 const press=get('press'),pv=scene(press,defaults(press));
 function liquidVolume(){return ['press-fluid-master','press-fluid-ram'].reduce((sum,name)=>{const o=pv.model.getObjectByName(name),q=o.geometry.parameters;return sum+Math.PI*q.radiusTop**2*q.height*o.scale.y;},0);}
 pv.tick(0);const V=liquidVolume();for(const t of [.5,1,2,3.9]){pv.tick(t);near(liquidVolume(),V);}pv.dispose();
+// The largest ram and full input stroke must still fit the depicted frame.
+const clearance=scene(press,{...defaults(press),ram:100,stroke:100});
+for(const time of [0,2,3.99]){clearance.tick(time);const left=new T.Box3().setFromObject(clearance.model.getObjectByName('press-frame-left')),right=new T.Box3().setFromObject(clearance.model.getObjectByName('press-frame-right')),ram=new T.Box3().setFromObject(clearance.model.getObjectByName('press-output-cylinder')),barrel=new T.Box3().setFromObject(clearance.model.getObjectByName('press-input-cylinder')),knob=new T.Box3().setFromObject(clearance.model.getObjectByName('press-input-knob'));assert.ok(ram.min.x>left.max.x&&ram.max.x<right.min.x);assert.ok(knob.min.y>barrel.max.y);}clearance.dispose();
 // Pressure cannot change brew flow when the calculation prescribes 2 mL/s.
 const espresso=get('espresso');const low=scene(espresso,{...defaults(espresso),pressure:3}),high=scene(espresso,{...defaults(espresso),pressure:12});assert.deepEqual(low.flows.map(f=>f.speed),high.flows.map(f=>f.speed));low.dispose();high.dispose();
 // Suspension bases stay attached as the drum oscillates.

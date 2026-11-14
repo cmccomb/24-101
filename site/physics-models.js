@@ -1,4 +1,4 @@
-import {stepResponse} from './core-systems.js?v=1.6.2';
+import {stepResponse} from './core-systems.js?v=1.6.3';
 // These are explanatory schematics. Numeric labels retain physical units;
 // dimensions, vector lengths and playback speeds use explicit display scales.
 export const visualGuides={
@@ -78,10 +78,10 @@ export function buildPhysicsModel(id,p,out,k){
   const I=(.8/3+p.payload)*p.reach**2;responseTrace(I,p.kd,p.kp,pi/6,L,origin,2);dimension([-1.1,.3,-.4],[-1.1+L,.3,-.4],null);
   ticks.push(t=>{const a=pi/6*stepResponse(I,p.kd,p.kp,(t%4));joint.rotation.z=a;loadArrow.position.set(-1.1+(L+.3)*Math.cos(a)+.3*Math.sin(a),.8+(L+.3)*Math.sin(a)-.3*Math.cos(a),.25);});label(`L ${num(p.reach,2)} m · hold ${num(out[0].value)} N·m · jaw ${num(out[1].value)} N`,[.1,.12,1]);label(`30° command · 2 s error ${num(out[3].value,2)}°`,[.4,2.5,.2]);
  }else if(id==='press'){
-  box(3.6,.18,1.6,C.dark,[0,.1,0]);for(const x of [.45,1.65])box(.15,2.85,.4,C.steel,[x,1.6,-.25]);box(1.6,.2,.65,C.dark,[1.05,3,0]);box(1.4,.15,.9,C.steel,[1.05,.65,0]);
-  const r1=p.master*.008,r2=p.ram*.008,c1=cyl(r1+.05,1.4,C.light,[-1.05,1.2,0]),c2=cyl(r2+.05,1.6,C.light,[1.05,2.15,0]);for(const c of [c1,c2]){c.material.transparent=true;c.material.opacity=.23;}
+  box(4.4,.18,1.6,C.dark,[.15,.1,0]);for(const x of [0,2.1]){const post=box(.15,2.85,.4,C.steel,[x,1.6,-.25]);post.name=x===0?'press-frame-left':'press-frame-right';}box(2.45,.2,.65,C.dark,[1.05,3,0]);box(2.25,.15,.9,C.steel,[1.05,.65,0]);
+  const r1=p.master*.008,r2=p.ram*.008,c1=cyl(r1+.05,1.4,C.light,[-1.05,1.2,0]),c2=cyl(r2+.05,1.6,C.light,[1.05,2.15,0]);c1.name='press-input-cylinder';c2.name='press-output-cylinder';for(const c of [c1,c2]){c.material.transparent=true;c.material.opacity=.23;}
   const fluid1=cyl(r1,1.3,C.blue,[-1.05,1.15,0]),fluid2=cyl(r2,.7,C.blue,[1.05,2.45,0]);fluid1.name='press-fluid-master';fluid2.name='press-fluid-ram';
-  const master=group([-1.05,1.8,0]),ram=group([1.05,2.1,0]);cyl(r1,.08,C.red,[0,0,0],master);cyl(.05,.6,C.steel,[0,.3,0],master);box(.55,.07,.3,C.dark,[0,.6,0],master);cyl(r2,.1,C.red,[0,0,0],ram);cyl(.08,.7,C.steel,[0,-.35,0],ram);box(.9,.12,.7,C.steel,[0,-.7,0],ram);
+  const master=group([-1.05,1.8,0]),ram=group([1.05,2.1,0]);cyl(r1,.08,C.red,[0,0,0],master);cyl(.05,1,C.steel,[0,.5,0],master);const knob=box(.55,.07,.3,C.dark,[0,1,0],master);knob.name='press-input-knob';cyl(r2,.1,C.red,[0,0,0],ram);cyl(.08,.7,C.steel,[0,-.35,0],ram);box(.9,.12,.7,C.steel,[0,-.7,0],ram);
   master.name='press-master';ram.name='press-ram';
   const liquid=flow([[-1.05,.7,0],[-.6,.4,0],[0,.4,0],[.15,2.8,0],[1.05,2.8,0]],C.blue,12,p.stroke/60);
   arrow([-1.7,2.7,.3],[0,-1,0],p.force*.003,C.red);arrow([1.95,2.5,.3],[0,-1,0],out[1].value*.05,C.red);

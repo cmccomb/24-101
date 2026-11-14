@@ -1,5 +1,5 @@
 import {SVGLoader} from './vendor/SVGLoader.js';
-import {maxSegments, pathsToLaserJob} from './fabrication.js?v=1.6.2';
+import {maxSegments, pathsToLaserJob} from './fabrication.js?v=1.6.3';
 
 function millimeters(length) {
   const match = String(length || '').trim().match(/^([+\-]?(?:\d+\.?\d*|\.\d+))\s*(mm|cm|in|px|pt|pc)?$/i);

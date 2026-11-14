@@ -1,4 +1,4 @@
-# Physics model review — November 13, 2026
+# Physics model review — November 13–14, 2026
 
 The first version rendered recognizable machines, but several inputs affected only numbers or animation speed. The revision gives each course model an explicit physical relationship to explain. Controls, 3D evidence and response plots remain beside each other on desktop; phones retain the model/plot switch and pinned results.
 
@@ -24,7 +24,7 @@ The hydraulic press replaces the excavator in week 6, reducing overlap with the 
 ## Verification
 
 - The complete calculation, conservation, scheduling, design-token and fabrication suites pass.
-- The real explanatory renderer is exercised in 126 default/boundary scene configurations at multiple animation times. Checks cover finite geometry, gravity direction, depicted press liquid volume, fixed espresso flow, attached springs and Buggy dynamics against an independent time-step solver.
+- The real explanatory renderer is exercised in 126 default/boundary scene configurations at multiple animation times. Checks cover finite geometry, gravity direction, depicted press liquid volume and piston/frame clearance, fixed espresso flow, attached springs and Buggy dynamics against an independent time-step solver.
 - All 56 mechanism controls and seven fabrication-job controls were checked with playback paused. Stable full-screen captures were cropped to the canvas, and text-label regions were excluded from pixel comparison. Every control changed rendered content. An unchanged paused view produced matching pixels.
 - All four built-in parts loaded; laser material switching updated the preview and calculations. Browser console checks returned no errors. The phone view was checked for horizontal overflow, readable controls and model/plot switching.
 
