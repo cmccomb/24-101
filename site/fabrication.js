@@ -1,4 +1,4 @@
-import {fmt} from './systems.js?v=1.5.0';
+import {fmt} from './systems.js?v=1.6.2';
 
 export const machines = {
   printer: {

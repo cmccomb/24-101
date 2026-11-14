@@ -1,4 +1,4 @@
-import {weeks,projects,areas,calendar,dateLabel} from '../course.js?v=1.5.0';
+import {weeks,projects,areas,calendar,dateLabel} from '../course.js?v=1.6.2';
 const $=id=>document.getElementById(id);
 $('projects').innerHTML=projects.map(p=>`<section><p class="eyebrow">Project ${p.id} · weeks ${p.start}–${p.end} · ${p.end-p.start+1} weeks</p><h2>${p.title}</h2><p>${p.outcome}</p></section>`).join('');
 $('calendar-note').textContent=calendar.note;

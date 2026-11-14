@@ -1,8 +1,9 @@
-import {weekFor, dateLabel, areas} from './course.js?v=1.5.0';
-import {systems, extraSystems, allSystems, defaults, fmt} from './systems.js?v=1.5.0';
-import {lessons, lessonFor, engineering, requirement, perturbation} from './engineering.js?v=1.5.0';
-import {machines, laserMaterials, maxFileBytes, jobSystem, finishJob} from './fabrication.js?v=1.5.0';
-import {createViewer} from './models.js?v=1.5.0';
+import {visualGuides} from './physics-models.js?v=1.6.2';
+import {weekFor, dateLabel, areas} from './course.js?v=1.6.2';
+import {systems, extraSystems, allSystems, defaults, fmt} from './systems.js?v=1.6.2';
+import {lessons, lessonFor, engineering, requirement, perturbation} from './engineering.js?v=1.6.2';
+import {machines, laserMaterials, maxFileBytes, jobSystem, finishJob} from './fabrication.js?v=1.6.2';
+import {createViewer} from './models.js?v=1.6.2';
 
 const $=id=>document.getElementById(id);
 const exampleParts={
@@ -30,6 +31,7 @@ const connections={
   bicycle:'Friction, torque and work–energy connect hand effort to stopping distance and heat. Tire load transfer and brake fade are outside this introductory model.',
   elevator:'Newton’s second law gives each rope tension. Axial stress and regenerative drive behavior extend into later solid mechanics and controls courses.',
   robot:'Rotational Newton’s law, moments and friction set joint and jaw loads. PD feedback and second-order step response extend into later controls courses.',
+  press:'Pascal’s principle relates pressure and piston force. Volume conservation trades displacement for force, while work conservation prevents energy multiplication.',
   excavator:'Pressure-area force and moment balance connect cylinder geometry to the load. Hydraulic flow and power extend into fluid mechanics.',
   pump:'Continuity and mechanical-energy balance relate flow, elevation and pressure head. Pump curves and friction loss extend into fluid mechanics.',
   washer:'Newton’s second law and spring–mass oscillations lead to a forced-vibration model. Phase, damping and isolation extend into vibrations.',
@@ -49,7 +51,7 @@ const viewer=createViewer($('viewport'),error=>{
   $('loading').textContent=`The 3D model needs WebGL. ${error.message} Inputs, equations and calculations remain available.`;
 },showJobProgress);
 if(viewer)$('loading').hidden=true;
-else for(const id of ['play','camera','cutaway','job-seek','job-rate','machine-view'])$(id).disabled=true;
+else for(const id of ['play','restart','camera','cutaway','job-seek','job-rate','machine-view'])$(id).disabled=true;
 function playbackLabel(){if(!viewer)return;$('play').textContent=viewer.playing?'Pause motion':'Play motion';$('play').setAttribute('aria-label',viewer.playing?'Pause animation':'Play animation');}
 playbackLabel();
 
@@ -60,7 +62,7 @@ function navigation(){
 }
 function controls(){
   const lesson=lessonFor(current);
-  $('parameters').innerHTML=current.params.map(p=>`<div class="parameter"><div class="param-head"><label for="range-${p.key}">${p.label}</label><div class="param-value"><input id="number-${p.key}" data-key="${p.key}" type="number" min="${p.min}" max="${p.max}" step="${p.step}" value="${params[p.key]}" aria-label="${p.label}" aria-describedby="help-${p.key}"><span class="param-unit">${p.unit}</span></div></div><input class="range" id="range-${p.key}" data-key="${p.key}" type="range" min="${p.min}" max="${p.max}" step="${p.step}" value="${params[p.key]}" aria-describedby="help-${p.key}"><span class="sr-only" id="help-${p.key}">${p.unit} ${p.help}</span></div>`).join('');
+  $('parameters').innerHTML=current.params.map(p=>`<div class="parameter"><div class="param-head"><label for="range-${p.key}">${p.label}</label><div class="param-value"><input id="number-${p.key}" data-key="${p.key}" type="number" min="${p.min}" max="${p.max}" step="${p.step}" value="${params[p.key]}" aria-label="${p.label}" aria-describedby="help-${p.key} model-note"><span class="param-unit">${p.unit}</span></div></div><input class="range" id="range-${p.key}" data-key="${p.key}" type="range" min="${p.min}" max="${p.max}" step="${p.step}" value="${params[p.key]}" aria-describedby="help-${p.key} model-note"><span class="sr-only" id="help-${p.key}">${p.unit} ${p.help}</span></div>`).join('');
   $('input-definitions').innerHTML=current.params.map(p=>`<dt>${p.label}</dt><dd>${lesson.roles[p.key]}. ${p.help}</dd>`).join('');
   $('sweep-input').innerHTML=current.params.map(p=>`<option value="${p.key}">${p.label}</option>`).join('');
   $('sweep-input').value=sweepKey;
@@ -208,6 +210,7 @@ function load(id,readHash=false){
   cancelAnimationFrame(modelFrame);
   modelFrame=0;
   syncFileUI();
+  showVisualNote();
   buildModel(true);
   if(needsFile)fileStatus('Load the same file to apply the shared job settings.');
 }
@@ -216,6 +219,13 @@ function normalize(p,value){return Math.min(p.max,Math.max(p.min,p.integer?Math.
 function refreshModel(){
   if(!viewer||modelFrame)return;
   modelFrame=requestAnimationFrame(()=>{modelFrame=0;buildModel(false);});
+}
+function showVisualNote(key){
+  const guide=visualGuides[current.id];
+  if(current.job){
+    const printer=current.id==='printer',cues=printer?{speed:'Blue arrow: feed override. Nominal playback timing uses the adjusted feeds.',flow:'Enlarged cursor area: extrusion override. The sliced paths remain fixed.',temp:'Cursor color: nozzle temperature. Heating demand updates with the material throughput.'}:{speed:'Blue arrow: cut speed. Nominal job time changes with travel speed.',power:'Cursor color: optical power. Compare absorbed energy with the removal demand.',thick:'Stock depth shows material thickness. The imported outline remains fixed.',kerf:'Enlarged cursor width shows the kerf assumption. Compare the resulting removal demand.'};
+    $('model-note').textContent=cues[key]||'Blue: feed setting. Red: heater or absorbed optical power. Enlarged cursor: temperature and extrusion/kerf; paths follow the file.';
+  }else $('model-note').textContent=guide?.[key]||guide?.summary||'Schematic motion; calculations retain physical units.';
 }
 function change(input,commit=false){
   const key=input.dataset.key,p=current.params.find(def=>def.key===key);
@@ -231,6 +241,7 @@ function change(input,commit=false){
       if(input.type==='range')$(`number-${key}`).value=next;
       update();
       refreshModel();
+      showVisualNote(key);
     }
   }
   if(commit){
@@ -304,7 +315,7 @@ function showJobProgress(progress,elapsed,duration,height){
 }
 function parseInWorker(text,kind){
   parserWorker?.terminate();
-  const worker=new Worker(new URL('./fabrication-worker.js?v=1.5.0',import.meta.url),{type:'module'});
+  const worker=new Worker(new URL('./fabrication-worker.js?v=1.6.2',import.meta.url),{type:'module'});
   parserWorker=worker;
   return new Promise((resolve,reject)=>{
     worker.onmessage=({data})=>{worker.terminate();if(parserWorker===worker)parserWorker=null;data.error?reject(new Error(data.error)):resolve(data.job);};
@@ -327,7 +338,7 @@ async function loadJob(file,id=current.id,exampleFile=null){
     let job;
     if(extension==='svg'){
       if(file.size>2*1024*1024)throw new Error('Simplify the SVG to under 2 MB before previewing.');
-      const {parseSVG}=await import('./fabrication-svg.js?v=1.5.0');
+      const {parseSVG}=await import('./fabrication-svg.js?v=1.6.2');
       job=parseSVG(text);
     }else job=await parseInWorker(text,id);
     if(sequence!==loadSequence)return;
@@ -423,6 +434,7 @@ $('reset').addEventListener('click',()=>{
   controls();
   update();
   refreshModel();
+  showVisualNote();
   announce();
 });
 $('baseline').addEventListener('click',()=>{references[stateKey]={params:{...params},result:current.calc(params),material:current.material};showResults();toast('Reference updated.');});
@@ -432,6 +444,8 @@ $('requirement-limit').addEventListener('input',e=>{const value=e.target.valueAs
 $('requirement-limit').addEventListener('change',e=>{e.target.value=target;announce();});
 $('requirement-limit').addEventListener('blur',e=>{if(e.target.valueAsNumber!==target)e.target.value=target;});
 $('play').addEventListener('click',()=>{if(viewer){viewer.setPlaying(!viewer.playing);playbackLabel();}});
+$('restart').addEventListener('click',()=>viewer?.restart());
+$('parameters').addEventListener('focusin',e=>{if(e.target.dataset.key)showVisualNote(e.target.dataset.key);});
 $('camera').addEventListener('click',()=>viewer?.resetCamera(current.id));
 $('cutaway').addEventListener('change',e=>viewer?.setCutaway(e.target.checked));
 $('share').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(designURL());toast(current.job?'Settings link copied. Load the same file to restore the job.':'Design link copied.');}catch{const input=document.createElement('textarea');input.value=designURL();document.body.append(input);input.select();const ok=document.execCommand('copy');input.remove();toast(ok?'Design link copied.':'Clipboard unavailable. The selected system is in the address bar.');}});

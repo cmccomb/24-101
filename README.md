@@ -1,12 +1,13 @@
 # 24-101 · MechE Systems Lab
 
-[Open the lab](https://cmccomb.com/24-101/) · [Course plan](https://cmccomb.com/24-101/course/) · [Shared system list](COURSE.md) · [Design reference](https://cmccomb.com/24-101/design/) · [Design specification](DESIGN.md) · [CMU 24-101](https://www.meche.engineering.cmu.edu/education/courses/24-101.html)
+[Open the lab](https://cmccomb.com/24-101/) · [Course plan](https://cmccomb.com/24-101/course/) · [Shared system list](COURSE.md) · [Physics model review](PHYSICS_REVIEW.md) · [Design reference](https://cmccomb.com/24-101/design/) · [Design specification](DESIGN.md) · [CMU 24-101](https://www.meche.engineering.cmu.edu/education/courses/24-101.html)
 
 Fourteen weekly mechanical systems introduce the breadth of CMU MechE through demonstrations, calculation breakdowns and design considerations. Laser cutting comes first, then FDM printing. Wednesday design methods directly support three sequential projects lasting 3, 4 and 7 weeks. [The course plan](COURSE.md) records each system, project deliverable and core-area connection. Prior examples remain available under Further systems.
 
 ## Explore
 
-- Orbit and zoom an orthographic 3D schematic, pause motion, and inspect transparent geometry.
+- Orbit and zoom an orthographic 3D schematic, pause or restart motion, and inspect transparent geometry. Every course input changes visible geometry, a physical vector, temperature, or a response marker even with playback paused.
+- Read force, heat, pressure and displacement labels on the model. Blue time markers compare robot and quadcopter responses at fixed times and show Buggy position at 20 seconds; enlarged bead, kerf and needle sections expose small dimensions.
 - Distinguish geometry, design capacities, operating conditions, boundary conditions and model assumptions.
 - Adjust inputs while watching the model, response plot and calculated quantities. On phones, switch between the model and plot while keeping the results in view.
 - Account for energy inputs, outputs and accumulation, or driving force, resistance and momentum change.
@@ -60,12 +61,13 @@ GitHub Pages deploys the `site/` directory after every push to `main`, following
 | --- | --- |
 | `site/course.js` | Canonical 14-week schedule, 3/4/7 project blocks, teaching notes, coverage and Carnival swap |
 | `site/course/` | Public course plan and core-area coverage map |
-| `site/core-systems.js` | Brakes, elevator, robot, excavator, pump, washer, quadcopter and autoinjector models |
+| `site/core-systems.js` | Brakes, elevator, robot, hydraulic press, pump, washer, quadcopter and autoinjector calculations; retained excavator model |
 | `site/systems.js` | Parameters, SI conversions, calculation models, assumptions, prompts and sources |
 | `site/engineering.js` | Lesson claims, boundaries, conservation accounts, requirements and model-applicability checks |
 | `design/tokens.json` | Shared color, typography, spacing, layout and motion tokens |
 | `site/tokens.css`, `site/theme.js` | Generated CSS and 3D material theme |
 | `site/design/` | Living visual reference with a working specimen using the actual printer model |
+| `site/physics-models.js` | Explanatory course models, physical vectors, magnified sections, fixed-time markers and per-control viewing cues |
 | `site/models.js` | Procedural 3D geometry, animation, orbit controls and labels |
 | `site/app.js` | Controls, results, accounts, charts, requirements, comparison, sharing and CSV export |
 | `site/fabrication.js` | Machine profiles, G-code/DXF parsers, file-based physics and playback timing |
@@ -75,6 +77,7 @@ GitHub Pages deploys the `site/` directory after every push to `main`, following
 | `tests/physics.test.mjs` | Parameter bounds, conservation, scaling and numerical convergence checks |
 | `tests/engineering.test.mjs` | Conservation accounts, requirement equality and feasibility, input roles and applicability |
 | `tests/design.test.mjs` | Identity, contrast and asset-version checks |
+| `tests/visual-models.test.mjs` | 126 animated scene configurations, physical directions, liquid conservation, attached springs, fixed brew flow and common-clock Buggy dynamics |
 | `tests/fabrication.test.mjs` | Parser modes, units, extrusion, curves, envelopes, material comparisons and timing |
 
 Run `npm run tokens` after editing the design tokens. Tests reject CSS or 3D palettes that drift from the source tokens. Versioned stylesheet and module URLs keep an interface revision from mixing with cached assets from an older revision.

@@ -1,5 +1,5 @@
-import {coreSystems} from './core-systems.js?v=1.5.0';
-import {weeks} from './course.js?v=1.5.0';
+import {coreSystems} from './core-systems.js?v=1.6.2';
+import {weeks} from './course.js?v=1.6.2';
 // SI units inside all calculations; UI units converted explicitly at the boundary.
 const therm='https://openstax.org/books/university-physics-volume-2/pages/4-key-equations';
 const mech='https://openstax.org/books/university-physics-volume-1/pages/8-3-conservation-of-energy';
@@ -114,5 +114,5 @@ export const defaults=s=>Object.fromEntries(s.params.map(p=>[p.key,p.value]));
 
 const library=[...coreSystems,...originalSystems];
 export const systems=weeks.map(w=>library.find(s=>s.id===w.id));
-export const extraSystems=originalSystems.filter(s=>!systems.some(active=>active.id===s.id));
+export const extraSystems=[...originalSystems,...coreSystems.filter(s=>s.id==='excavator')].filter(s=>!systems.some(active=>active.id===s.id));
 export const allSystems=[...systems,...extraSystems];

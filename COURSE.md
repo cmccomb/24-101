@@ -23,7 +23,7 @@ Buggy is **Monday, April 12, 2027**, immediately before Carnival, April 15–17.
 | 3 | 1 | [Bicycle brake and wheel](https://cmccomb.com/24-101/#bicycle) · 2027-02-01 | 2027-02-03: Rapid prototyping, demonstration and retrospective. P1: demonstrate, test and reflect on the prototype. |
 | 4 | 2 | [Elevator](https://cmccomb.com/24-101/#elevator) · 2027-02-08 | 2027-02-10: Project planning, stakeholders and team charter. P2: launch with a charter, milestones and stakeholder map. |
 | 5 | 2 | [Robot arm and gripper](https://cmccomb.com/24-101/#robot) · 2027-02-15 | 2027-02-17: Customer needs and target specifications. P2: submit a needs-to-specifications trace. |
-| 6 | 2 | [Hydraulic excavator](https://cmccomb.com/24-101/#excavator) · 2027-02-22 | 2027-02-24: Concept generation and systematic selection. P2: compare alternatives and justify the selected concept. |
+| 6 | 2 | [Hydraulic press](https://cmccomb.com/24-101/#press) · 2027-02-22 | 2027-02-24: Concept generation and systematic selection. P2: compare alternatives and justify the selected concept. |
 | 7 | 2 | [Centrifugal pump and piping loop](https://cmccomb.com/24-101/#pump) · 2027-03-01 | 2027-03-03: Concept testing and prototype review. P2: present test evidence and a retrospective. |
 | 8 | 3 | [Refrigerator / heat pump](https://cmccomb.com/24-101/#refrigerator) · 2027-03-15 | 2027-03-17: Stakeholder research and agile planning. P3: launch with a research plan and iteration backlog. |
 | 9 | 3 | [Espresso machine](https://cmccomb.com/24-101/#espresso) · 2027-03-22 | 2027-03-24: Specifications, concepts and downselection. P3: baseline specifications and select an initial concept. |
@@ -70,12 +70,12 @@ Buggy is **Monday, April 12, 2027**, immediately before Carnival, April 15–17.
 - **Project connection:** Build a needs-to-specifications trace for the active concept.
 - **MechE coverage:** Statics and solids; Mechanisms; Sensing and actuation; Controls; Numerical or experimental modeling; Human-centered product design.
 
-### 6. Hydraulic excavator
+### 6. Hydraulic press
 
-- **Demonstrate:** Move a syringe-driven boom; vary the cylinder attachment point.
-- **Calculate and design:** Use pressure-area force and moment balance; consider linkage leverage, cylinder flow, seals and tipping.
+- **Demonstrate:** Push two connected syringe pistons of different diameters; compare force and travel.
+- **Calculate and design:** Apply Pascal’s principle, pressure-area force, displaced volume and work conservation; consider frame stress, seals and relief valves.
 - **Project connection:** Compare concepts using the same load case and constraints.
-- **MechE coverage:** Statics and solids; Mechanisms; Fluids; Sensing and actuation.
+- **MechE coverage:** Manufacturing and materials; Statics and solids; Mechanisms; Fluids; Sensing and actuation.
 
 ### 7. Centrifugal pump and piping loop
 
@@ -137,14 +137,14 @@ Buggy is **Monday, April 12, 2027**, immediately before Carnival, April 15–17.
 
 | CMU MechE core area | Teaching examples |
 | --- | --- |
-| Manufacturing and materials | 1. Laser cutter; 2. FDM 3D printer |
-| Statics and solids | 3. Bicycle brake and wheel; 4. Elevator; 5. Robot arm and gripper; 6. Hydraulic excavator; 10. Washing machine suspension; 12. CMU Buggy; 13. Autoinjector |
-| Mechanisms | 3. Bicycle brake and wheel; 4. Elevator; 5. Robot arm and gripper; 6. Hydraulic excavator; 13. Autoinjector |
+| Manufacturing and materials | 1. Laser cutter; 2. FDM 3D printer; 6. Hydraulic press |
+| Statics and solids | 3. Bicycle brake and wheel; 4. Elevator; 5. Robot arm and gripper; 6. Hydraulic press; 10. Washing machine suspension; 12. CMU Buggy; 13. Autoinjector |
+| Mechanisms | 3. Bicycle brake and wheel; 4. Elevator; 5. Robot arm and gripper; 6. Hydraulic press; 13. Autoinjector |
 | Thermodynamics | 8. Refrigerator / heat pump; 9. Espresso machine; 14. Data-center cooling system |
 | Heat transfer | 1. Laser cutter; 2. FDM 3D printer; 8. Refrigerator / heat pump; 9. Espresso machine; 14. Data-center cooling system |
-| Fluids | 6. Hydraulic excavator; 7. Centrifugal pump and piping loop; 9. Espresso machine; 11. Quadcopter; 12. CMU Buggy; 13. Autoinjector; 14. Data-center cooling system |
+| Fluids | 6. Hydraulic press; 7. Centrifugal pump and piping loop; 9. Espresso machine; 11. Quadcopter; 12. CMU Buggy; 13. Autoinjector; 14. Data-center cooling system |
 | Dynamics and vibration | 3. Bicycle brake and wheel; 10. Washing machine suspension; 11. Quadcopter; 12. CMU Buggy |
-| Sensing and actuation | 2. FDM 3D printer; 4. Elevator; 5. Robot arm and gripper; 6. Hydraulic excavator; 7. Centrifugal pump and piping loop; 9. Espresso machine; 11. Quadcopter; 14. Data-center cooling system |
+| Sensing and actuation | 2. FDM 3D printer; 4. Elevator; 5. Robot arm and gripper; 6. Hydraulic press; 7. Centrifugal pump and piping loop; 9. Espresso machine; 11. Quadcopter; 14. Data-center cooling system |
 | Controls | 2. FDM 3D printer; 4. Elevator; 5. Robot arm and gripper; 8. Refrigerator / heat pump; 11. Quadcopter; 14. Data-center cooling system |
 | Numerical or experimental modeling | 1. Laser cutter; 2. FDM 3D printer; 5. Robot arm and gripper; 7. Centrifugal pump and piping loop; 8. Refrigerator / heat pump; 10. Washing machine suspension; 11. Quadcopter; 12. CMU Buggy; 13. Autoinjector; 14. Data-center cooling system |
 | Human-centered product design | 1. Laser cutter; 3. Bicycle brake and wheel; 4. Elevator; 5. Robot arm and gripper; 8. Refrigerator / heat pump; 9. Espresso machine; 10. Washing machine suspension; 12. CMU Buggy; 13. Autoinjector |
@@ -158,7 +158,7 @@ Coverage describes introductory calculations, demonstrations and design discussi
 3. Bicycle brake and wheel
 4. Elevator
 5. Robot arm and gripper
-6. Hydraulic excavator
+6. Hydraulic press
 7. Centrifugal pump and piping loop
 8. Refrigerator / heat pump
 9. Espresso machine

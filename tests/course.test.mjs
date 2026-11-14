@@ -18,6 +18,7 @@ const alternate=resolveOrder(calendar.mondays,'2027-04-22');assert.equal(alterna
 const earlier=resolveOrder(calendar.mondays,'2027-04-08');assert.equal(earlier[10],'buggy');assert.equal(earlier[12],'quadcopter');assert.equal(new Set(earlier).size,14);
 assert.throws(()=>resolveOrder(calendar.mondays,'2027-03-11'));assert.throws(()=>resolveOrder(calendar.mondays,'2027-01-28'));assert.throws(()=>resolveOrder([...calendar.mondays].reverse(),calendar.carnival));
 // Independent physical checks of the new models.
+let press=calc('press');close(press[3],press[1]*press[2]);close(calc('press',{ram:100})[1]/calc('press',{ram:50})[1],4);close(calc('press',{ram:100})[2]/calc('press',{ram:50})[2],.25);
 let b=calc('bicycle');close(b[1]*b[2],b[3]*1000);close(calc('bicycle',{speed:50})[2],4*b[2]);
 let el=calc('elevator',{payload:100,counter:700});assert.ok(el[2]<0,'Counterweight can drive regeneration');
 close(el[0],400*(9.81+.5));close(el[1],700*(9.81-.5));
@@ -39,5 +40,5 @@ assert.equal(engineering(get('autoinjector'),{...defaults(get('autoinjector')),v
 const ap=Math.PI*.004**2,R=128*.004*.012/(Math.PI*.00025**4),x=a[2]/1e6/ap,tau=R*ap*ap/400;
 close(x,Math.min(.012,(.025-1/400)*(1-Math.exp(-5/tau))));
 for(const s of allSystems){assert.ok(lessonFor(s));const a=engineering(s,defaults(s));assert.ok(Number.isFinite(a.residual));}
-const models=readFileSync(new URL('../site/models.js',import.meta.url),'utf8');for(const s of systems)assert.ok(models.includes("id==='"+s.id+"'"),s.id+' needs a model');
+const models=readFileSync(new URL('../site/physics-models.js',import.meta.url),'utf8');for(const s of systems)assert.ok(models.includes("id==='"+s.id+"'"),s.id+' needs a model');
 console.log('Passed 14-week schedule, 3/4/7 projects, calendar swaps, complete core coverage, new-model physics and independent PD integration.');

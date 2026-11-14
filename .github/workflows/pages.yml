@@ -27,6 +27,7 @@ jobs:
         run: |
           node --check site/app.js
           node --check site/models.js
+          node --check site/physics-models.js
           node --check site/course.js
           node --check site/core-systems.js
           node --check site/course/plan.js

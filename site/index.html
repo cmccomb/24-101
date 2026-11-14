@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>24-101 · Mechanical Engineering Systems</title>
   <meta name="description" content="Define a system boundary. Apply conservation laws. Change a design variable and test a requirement.">
-  <link rel="stylesheet" href="./tokens.css?v=1.5.0">
-  <link rel="stylesheet" href="./style.css?v=1.5.0">
-  <link rel="stylesheet" href="./lab.css?v=1.5.0">
+  <link rel="stylesheet" href="./tokens.css?v=1.6.2">
+  <link rel="stylesheet" href="./style.css?v=1.6.2">
+  <link rel="stylesheet" href="./lab.css?v=1.6.2">
 </head>
 <body class="lab">
   <a class="skip" href="#main">Skip to system</a>
@@ -49,13 +49,14 @@
             </div>
             <figure class="model-figure" id="model-panel">
               <div id="viewport"><div id="loading" class="loading">Loading 3D model.</div></div>
-              <div class="model-tools"><button id="play" aria-label="Pause animation">Pause motion</button><button id="camera">Reset view</button><button id="machine-view" hidden>Machine view</button><label><input id="cutaway" type="checkbox"> Transparent</label></div>
+              <div class="model-tools"><button id="play" aria-label="Pause animation">Pause motion</button><button id="restart">Restart</button><button id="camera">Reset view</button><button id="machine-view" hidden>Machine view</button><label><input id="cutaway" type="checkbox"> Transparent</label></div>
               <div id="job-playback" class="job-playback" hidden>
                 <label for="job-seek">Job position</label><input id="job-seek" type="range" min="0" max="1000" step="1" value="0">
                 <select id="job-rate" aria-label="Playback speed"><option value="1">1× time</option><option value="30" selected>30× time</option><option value="120">120× time</option><option value="600">600× time</option></select>
                 <output id="job-clock" for="job-seek" aria-live="off"></output>
               </div>
               <figcaption id="model-caption">Schematic geometry and motion</figcaption>
+              <p id="model-note" class="model-note"></p>
             </figure>
             <section class="parameter-study" id="plot-panel" aria-label="Response plot">
               <div class="study-controls"><label>Vary <select id="sweep-input"></select></label><label>Measure <select id="sweep-output"></select></label></div>
@@ -110,6 +111,6 @@
     </main>
   </div>
   <div id="toast" role="status"></div>
-  <script type="module" src="./app.js?v=1.5.0"></script>
+  <script type="module" src="./app.js?v=1.6.2"></script>
 </body>
 </html>
