@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import {systems,defaults} from '../site/systems.js';
-import {lessons,engineering,requirement,perturbation} from '../site/engineering.js';
+import {allSystems as systems,defaults} from '../site/systems.js';
+import {lessons,lessonFor,engineering,requirement,perturbation} from '../site/engineering.js';
 
 let configurations=0;
 for(const s of systems){
-  const lesson=lessons[s.id],base=defaults(s);assert.ok(lesson.claim.endsWith('.'));
+  const lesson=lessonFor(s),base=defaults(s);assert.ok(lesson.claim.endsWith('.'));
   assert.ok(s.params.find(p=>p.key===lesson.sweep[0]));
   for(const p of s.params)assert.ok(lesson.roles[p.key],`${s.id}.${p.key} needs a physical role`);
   for(let mask=0;mask<2**s.params.length;mask++){

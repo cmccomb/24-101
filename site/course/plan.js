@@ -1,0 +1,6 @@
+import {weeks,projects,areas,calendar,dateLabel} from '../course.js?v=1.5.0';
+const $=id=>document.getElementById(id);
+$('projects').innerHTML=projects.map(p=>`<section><p class="eyebrow">Project ${p.id} · weeks ${p.start}–${p.end} · ${p.end-p.start+1} weeks</p><h2>${p.title}</h2><p>${p.outcome}</p></section>`).join('');
+$('calendar-note').textContent=calendar.note;
+$('weeks').innerHTML=weeks.map(w=>`<tr><th scope="row">${String(w.week).padStart(2,'0')}<small>Project ${w.project}</small></th><td><small>${w.meeting?dateLabel(w.meeting):'Jan 18 closed · make-up TBD'}</small><h3><a href="../#${w.id}">${w.title}</a></h3><p><strong>Demonstrate:</strong> ${w.demo}</p><p><strong>Calculate and design:</strong> ${w.design}</p><p class="tags">${w.coverage.map(key=>areas[key]).join(' · ')}</p>${w.id==='refrigerator'?'<p><a href="../#heatpump">Explore the heat-pump alternative</a></p>':''}</td><td><small>${dateLabel(w.wednesday)}</small><h3>${w.method}</h3><p>${w.deliverable}</p><p>${w.transfer}</p></td></tr>`).join('');
+$('coverage-map').innerHTML=Object.entries(areas).map(([key,label])=>`<div><dt>${label}</dt><dd>${weeks.filter(w=>w.coverage.includes(key)).map(w=>`<a href="../#${w.id}">${w.week}. ${w.title}</a>`).join(' · ')}</dd></div>`).join('');

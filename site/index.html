@@ -5,25 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>24-101 · Mechanical Engineering Systems</title>
   <meta name="description" content="Define a system boundary. Apply conservation laws. Change a design variable and test a requirement.">
-  <link rel="stylesheet" href="./tokens.css?v=1.4.3">
-  <link rel="stylesheet" href="./style.css?v=1.4.3">
-  <link rel="stylesheet" href="./lab.css?v=1.4.3">
+  <link rel="stylesheet" href="./tokens.css?v=1.5.0">
+  <link rel="stylesheet" href="./style.css?v=1.5.0">
+  <link rel="stylesheet" href="./lab.css?v=1.5.0">
 </head>
 <body class="lab">
   <a class="skip" href="#main">Skip to system</a>
   <header class="site-header">
-    <a class="course-title" href="#printer"><strong>24-101</strong><span>Fundamentals of Mechanical Engineering</span></a>
-    <div class="header-links"><button id="share" class="text-button">Link to this design</button><a href="https://github.com/cmccomb/24-101">Source</a></div>
+    <a class="course-title" href="#laser"><strong>24-101</strong><span>Fundamentals of Mechanical Engineering</span></a>
+    <div class="header-links"><a href="./course/">Course plan</a><button id="share" class="text-button">Link to this design</button><a href="https://github.com/cmccomb/24-101">Source</a></div>
   </header>
   <div class="page">
     <aside class="sidebar" aria-label="Systems">
-      <h2>Systems</h2><nav id="system-list"></nav>
+      <h2>Monday systems</h2><nav id="system-list"></nav>
     </aside>
     <main id="main">
       <header class="lesson-heading">
         <label class="system-picker">System <select id="system-select"></select></label>
-        <p class="system-name"><span id="number">01</span><span id="system-name">3D printer</span></p>
-        <h1 id="claim">Faster deposition requires more heating power.</h1>
+        <p id="course-context" class="course-context"></p>
+        <p class="system-name"><span id="number">01</span><span id="system-name">Laser cutter</span></p>
+        <h1 id="claim">Cutting faster reduces the energy delivered per unit length.</h1>
         <div id="fabrication" class="fabrication" hidden>
           <label class="file-picker"><span id="file-label">Load G-code</span><input id="job-file" type="file" accept=".gcode,.gco,.gc" aria-labelledby="file-label"></label>
           <label class="example-picker">Example part <select id="job-example"><option value="" disabled selected>Choose a part…</option></select></label>
@@ -81,6 +82,14 @@
         <p id="machine-details" hidden></p>
         <p id="local-response"></p><p id="reference-inputs" class="reference-inputs"></p>
         <button id="csv" class="text-button">Download plot data (CSV)</button>
+        <details class="physics" id="monday-plan">
+          <summary>Demonstration, design and project connection</summary>
+          <h3>Monday demonstration</h3><p id="demonstration"></p>
+          <h3>Design considerations</h3><p id="design-considerations"></p>
+          <p id="coverage"></p>
+          <h3>Active project</h3><p id="wednesday-method"></p><p id="project-transfer"></p>
+          <a href="./course/">14-week plan and MechE coverage</a>
+        </details>
         <details class="physics" id="physics">
           <summary>Physics and assumptions</summary>
           <p class="physics-topics" id="physics-topics"></p>
@@ -101,6 +110,6 @@
     </main>
   </div>
   <div id="toast" role="status"></div>
-  <script type="module" src="./app.js?v=1.4.3"></script>
+  <script type="module" src="./app.js?v=1.5.0"></script>
 </body>
 </html>

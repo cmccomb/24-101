@@ -1,7 +1,8 @@
-import {systems, defaults, fmt} from './systems.js?v=1.4.3';
-import {lessons, lessonFor, engineering, requirement, perturbation} from './engineering.js?v=1.4.3';
-import {machines, laserMaterials, maxFileBytes, jobSystem, finishJob} from './fabrication.js?v=1.4.3';
-import {createViewer} from './models.js?v=1.4.3';
+import {weekFor, dateLabel, areas} from './course.js?v=1.5.0';
+import {systems, extraSystems, allSystems, defaults, fmt} from './systems.js?v=1.5.0';
+import {lessons, lessonFor, engineering, requirement, perturbation} from './engineering.js?v=1.5.0';
+import {machines, laserMaterials, maxFileBytes, jobSystem, finishJob} from './fabrication.js?v=1.5.0';
+import {createViewer} from './models.js?v=1.5.0';
 
 const $=id=>document.getElementById(id);
 const exampleParts={
@@ -26,7 +27,15 @@ const connections={
   solar:'Heat capacity and the first law set the storage balance. The exponential response extends the course concepts with a differential equation.',
   battery:'Heat capacity and energy conservation explain the thermal response. Current, voltage and Joule heating extend into 33-142.',
   datacenter:'Heat capacity and energy conservation connect heat rate, mass flow and temperature rise. The fan system curve extends into fluid mechanics.',
-  bicycle:'Torque and angular speed determine rotational power. Rolling without slipping relates wheel angular speed to travel speed.',
+  bicycle:'Friction, torque and work–energy connect hand effort to stopping distance and heat. Tire load transfer and brake fade are outside this introductory model.',
+  elevator:'Newton’s second law gives each rope tension. Axial stress and regenerative drive behavior extend into later solid mechanics and controls courses.',
+  robot:'Rotational Newton’s law, moments and friction set joint and jaw loads. PD feedback and second-order step response extend into later controls courses.',
+  excavator:'Pressure-area force and moment balance connect cylinder geometry to the load. Hydraulic flow and power extend into fluid mechanics.',
+  pump:'Continuity and mechanical-energy balance relate flow, elevation and pressure head. Pump curves and friction loss extend into fluid mechanics.',
+  washer:'Newton’s second law and spring–mass oscillations lead to a forced-vibration model. Phase, damping and isolation extend into vibrations.',
+  quadcopter:'Newton’s laws connect thrust to weight and torque to roll acceleration. Actuator-disk flow and feedback control extend into later fluids and controls courses.',
+  autoinjector:'Spring potential energy and work connect plunger motion to dissipation. Poiseuille resistance extends into fluid mechanics.',
+  drivetrain:'Torque and angular speed determine rotational power. Rolling without slipping relates wheel angular speed to travel speed.',
   buggy:'Newton’s laws, gravitational potential energy, kinetic energy and resistance forces explain freeroll.',
   racecar:'Newton’s laws, friction and kinetic energy explain acceleration. P = Fv relates power to available driving force.'
 };
@@ -34,7 +43,7 @@ const connections={
 let current=systems[0],params=defaults(current),result,account;
 let sweepKey=lessonFor(current).sweep[0],sweepIndex=lessonFor(current).sweep[1],target=lessonFor(current).criterion.target;
 const designs={},references={},targets={},files={},pendingFileSettings={};
-let stateKey='printer',fileSequence=0,loadSequence=0,parserWorker;let samples=[],sampleKey,modelFrame;
+let stateKey='laser',fileSequence=0,loadSequence=0,parserWorker;let samples=[],sampleKey,modelFrame;
 const viewer=createViewer($('viewport'),error=>{
   $('loading').hidden=false;
   $('loading').textContent=`The 3D model needs WebGL. ${error.message} Inputs, equations and calculations remain available.`;
@@ -45,12 +54,9 @@ function playbackLabel(){if(!viewer)return;$('play').textContent=viewer.playing?
 playbackLabel();
 
 function navigation(){
-  let category='';
-  $('system-list').innerHTML=systems.map((s,i)=>{
-    let heading='';if(s.category!==category){category=s.category;heading=`<div class="nav-group">${category}</div>`;}
-    return`${heading}<button class="nav-item" data-system="${s.id}" ${s.id===current.id?'aria-current="page"':''}><span class="nav-number">${String(i+1).padStart(2,'0')}</span>${s.title}</button>`;
-  }).join('');
-  $('system-select').innerHTML=systems.map((s,i)=>`<option value="${s.id}">${i+1}. ${s.title}</option>`).join('');
+  $('system-list').innerHTML=systems.map((s,i)=>`<button class="nav-item" data-system="${s.id}" ${s.id===current.id?'aria-current="page"':''}><span class="nav-number">${String(i+1).padStart(2,'0')}</span>${s.title}</button>`).join('')+`<details class="further-systems"><summary>Further systems</summary>${extraSystems.map(s=>`<button class="nav-item" data-system="${s.id}">${s.title}</button>`).join('')}</details>`;
+  $('system-select').innerHTML='<optgroup label="Monday systems">'+systems.map((s,i)=>`<option value="${s.id}">${i+1}. ${s.title}</option>`).join('')+'</optgroup><optgroup label="Further systems">'+extraSystems.map(s=>`<option value="${s.id}">${s.title}</option>`).join('')+'</optgroup>';
+
 }
 function controls(){
   const lesson=lessonFor(current);
@@ -150,7 +156,7 @@ function chart(){
   node.setAttribute('aria-label',`${m.label} in ${m.unit} versus ${p.label} from ${p.min} to ${p.max} ${p.unit}. Current response ${fmt(m.value)} ${m.unit}.`);
   const notes=[];
   if(compareLimit)notes.push(showLimit?`Dashed blue: ${fmt(target)} ${m.unit} requirement.`:`${fmt(target)} ${m.unit} requirement is ${target>high?'above':'below'} the plotted range.`);
-  if(samples.some(s=>!s.valid))notes.push(current.job?'Dashed gray: outside the machine envelope.':'Dashed gray: outside the liquid-water model.');
+  if(samples.some(s=>!s.valid))notes.push(current.job?'Dashed gray: outside the machine envelope.':current.id==='autoinjector'?'Dashed gray: outside the assumed laminar-flow range.':'Dashed gray: outside the liquid-water model.');
   $('plot-note').textContent=notes.join(' ');
   $('plot-note').hidden=notes.length===0;
 }
@@ -162,7 +168,7 @@ function showLocalResponse(){
 }
 function update(){result=current.calc(params);account=engineering(current,params,result);showResults();showAccount();showRequirement();chart();showLocalResponse();showEquations();showJobSummary();}
 function load(id,readHash=false){
-  const source=systems.find(s=>s.id===id)||systems[0];
+  const source=allSystems.find(s=>s.id===id)||systems[0];
   const file=files[source.id],query=new URLSearchParams(location.hash.split('?')[1]||'');
   if(readHash&&file&&query.get('mode')==='file'){
     file.enabled=true;
@@ -177,9 +183,20 @@ function load(id,readHash=false){
   if(readHash&&!needsFile&&current.id===id){const q=new URLSearchParams(location.hash.split('?')[1]||'');for(const p of current.params){if(q.has(p.key)){const value=Number(q.get(p.key));if(Number.isFinite(value))params[p.key]=normalize(p,value);}}if(q.has('limit')){const value=Number(q.get('limit'));if(Number.isFinite(value)&&value>=0&&value<=(lesson.criterion.maxTarget??1e9))target=value;}}
   references[stateKey]??={params:defaults(current),result:current.calc(defaults(current)),material:current.material};
   designs[stateKey]={...params};targets[stateKey]=target;sweepKey=lesson.sweep[0];sweepIndex=lesson.sweep[1];result=current.calc(params);
-  $('system-name').textContent=current.title;$('number').textContent=String(systems.findIndex(s=>s.id===current.id)+1).padStart(2,'0');$('claim').textContent=lesson.claim;$('problem').textContent=lesson.problem;document.title=`${current.title} · 24-101`;
-  $('schedule').hidden=!current.schedule;$('schedule').textContent=current.schedule||'';
-  $('physics-topics').textContent=current.physics;$('assumptions').textContent=current.assumptions;$('cmu').textContent=current.cmu;$('physics-connection').textContent=connections[current.id];$('prompt').textContent=current.prompt;
+  $('system-name').textContent=current.title;$('number').textContent=weekFor(current.id)?String(weekFor(current.id).week).padStart(2,'0'):'+';$('claim').textContent=lesson.claim;$('problem').textContent=lesson.problem;document.title=`${current.title} · 24-101`;
+  const week=weekFor(current.id);
+  $('course-context').textContent=week?`Week ${week.week} · Project ${week.project} · ${week.meeting?dateLabel(week.meeting):'Make-up date TBD'}`:'Further exploration';
+  $('monday-plan').hidden=!week;
+  if(week){
+    $('demonstration').textContent=week.demo;
+    $('design-considerations').textContent=week.design;
+    $('coverage').textContent=week.coverage.map(key=>areas[key]).join(' · ');
+    $('wednesday-method').textContent=`Wednesday, ${dateLabel(week.wednesday)}: ${week.method}. ${week.deliverable}`;
+    $('project-transfer').textContent=week.transfer;
+  }
+  const schedule=week?.id==='buggy'?`Monday immediately before Spring Carnival · ${dateLabel(week.meeting)}, ${week.meeting.slice(0,4)}`:current.schedule;
+  $('schedule').hidden=!schedule;$('schedule').textContent=schedule||'';
+  $('physics-topics').textContent=current.physics;$('assumptions').textContent=current.assumptions;$('cmu').textContent=current.cmu;$('physics-connection').textContent=connections[current.id]||lesson.interpretation;$('prompt').textContent=current.prompt;
   $('sources').innerHTML=current.sources.map(([label,url])=>`<a href="${url}" target="_blank" rel="noopener">${label}</a>`).join('');
   $('system-select').value=current.id;
   for(const button of document.querySelectorAll('[data-system]')){
@@ -287,7 +304,7 @@ function showJobProgress(progress,elapsed,duration,height){
 }
 function parseInWorker(text,kind){
   parserWorker?.terminate();
-  const worker=new Worker(new URL('./fabrication-worker.js?v=1.4.3',import.meta.url),{type:'module'});
+  const worker=new Worker(new URL('./fabrication-worker.js?v=1.5.0',import.meta.url),{type:'module'});
   parserWorker=worker;
   return new Promise((resolve,reject)=>{
     worker.onmessage=({data})=>{worker.terminate();if(parserWorker===worker)parserWorker=null;data.error?reject(new Error(data.error)):resolve(data.job);};
@@ -310,7 +327,7 @@ async function loadJob(file,id=current.id,exampleFile=null){
     let job;
     if(extension==='svg'){
       if(file.size>2*1024*1024)throw new Error('Simplify the SVG to under 2 MB before previewing.');
-      const {parseSVG}=await import('./fabrication-svg.js?v=1.4.3');
+      const {parseSVG}=await import('./fabrication-svg.js?v=1.5.0');
       job=parseSVG(text);
     }else job=await parseInWorker(text,id);
     if(sequence!==loadSequence)return;
@@ -422,13 +439,13 @@ $('csv').addEventListener('click',()=>{const p=current.params.find(p=>p.key===sw
 function hashSystem(){return location.hash.slice(1).split('?')[0];}
 window.addEventListener('hashchange',()=>{
   const id=hashSystem();
-  if(!id||systems.some(s=>s.id===id)){
-    load(id||'printer',true);
+  if(!id||allSystems.some(s=>s.id===id)){
+    load(id||'laser',true);
     window.scrollTo(0,0);
   }
 });
 navigation();
-load(hashSystem()||'printer',true);
+load(hashSystem()||'laser',true);
 const chartObserver=new ResizeObserver(chart);
 chartObserver.observe($('chart'));
 const evidenceObserver=new ResizeObserver(entries=>{

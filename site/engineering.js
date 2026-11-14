@@ -89,7 +89,7 @@ export const lessons = {
     sweep: ['flow', 0], roles: {load:'Operating condition',flow:'Operating condition',supply:'Boundary condition'},
     interpretation: 'The rack heat balance and fan system curve are separate models. Their intersection defines the tradeoff between exhaust temperature and fan energy.'
   },
-  bicycle: {
+  drivetrain: {
     claim: 'A larger rear sprocket trades wheel speed for torque.',
     problem: 'Choose sprocket sizes that meet a hub torque requirement at a given crank torque.',
     boundary: 'Crank, chain and engaged rear hub at steady cadence', balance: 'τcrank ωcrank = τhub ωwheel', kind: 'Power balance', unit: 'W',
@@ -132,7 +132,7 @@ export function engineering(s,p,r=s.calc(p)) {
     case 'solar':{let q=.65*p.area*p.sun/1000,loss=p.ua*(m[1]-20)/1000;input=[term('Collected solar heat',q)];output=[term('Heat loss',loss),term('Rate of energy storage',q-loss,true)];break;}
     case 'battery':{let cooling=p.ua*(m[2]-p.ambient)/1000;input=[term('Resistive heating',m[1])];output=[term('Cooling rate',cooling),term('Rate of energy storage',m[1]-cooling,true)];break;}
     case 'datacenter':input=[term('IT electrical power',p.load)];output=[term('Heat carried by air',1.2*p.flow*1005*m[1]/1000)];break;
-    case 'bicycle': input=[term('Crank input',p.torque*p.cadence*Math.PI/30)];output=[term('Hub output',m[1]*m[0]*Math.PI/30)];break;
+    case 'drivetrain': input=[term('Crank input',p.torque*p.cadence*Math.PI/30)];output=[term('Hub output',m[1]*m[0]*Math.PI/30)];break;
     case 'buggy':{let energy=p.mass*9.81*p.height/1000,kinetic=.5*p.mass*(m[0]/3.6)**2/1000,roll=p.crr*p.mass*9.81*Math.sqrt(1-(p.height/p.length)**2)*p.length/1000;input=[term('Gravitational energy',energy)];output=[term('Final kinetic energy',kinetic,true),term('Rolling loss',roll),term('Aerodynamic loss',energy-kinetic-roll)];break;}
     case 'racecar':{let v=80/3.6,drive=Math.min(p.grip*p.mass*9.81,p.power*1000/v),roll=.015*p.mass*9.81,drag=.5*1.225*p.cda*v*v;input=[term('Driving force',drive)];output=[term('Rolling resistance',roll),term('Aerodynamic drag',drag),term('Momentum-change rate (ma)',drive-roll-drag,true)];break;}
   }

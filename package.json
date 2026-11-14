@@ -1,1 +1,12 @@
-{"name":"24-101-systems-lab","version":"1.4.3","private":true,"type":"module","repository":"github:cmccomb/24-101","scripts":{"start":"python3 -m http.server 8765 --directory site","tokens":"node scripts/design-tokens.mjs","test":"node scripts/design-tokens.mjs --check && node tests/design.test.mjs && node tests/physics.test.mjs && node tests/engineering.test.mjs && node tests/fabrication.test.mjs"}}
+{
+  "name": "24-101-systems-lab",
+  "version": "1.5.0",
+  "private": true,
+  "type": "module",
+  "repository": "github:cmccomb/24-101",
+  "scripts": {
+    "start": "python3 -m http.server 8765 --directory site",
+    "tokens": "node scripts/design-tokens.mjs",
+    "test": "node scripts/design-tokens.mjs --check && node tests/design.test.mjs && node tests/physics.test.mjs && node tests/engineering.test.mjs && node tests/fabrication.test.mjs && node scripts/course-plan.mjs --check && node tests/course.test.mjs"
+  }
+}

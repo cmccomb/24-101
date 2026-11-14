@@ -233,3 +233,5 @@
   .live-evidence { position: sticky; z-index: 5; top: 0; padding-bottom: 4px; }
   .lab .inspector :is(button, input) { scroll-margin-top: calc(var(--evidence-height, 420px) + 12px); }
 }
+
+.course-context{font-size:12px;color:var(--color-muted);margin:0 0 5px;font-variant-numeric:tabular-nums}.further-systems{margin-top:16px;border-top:1px solid var(--color-line);padding-top:10px}.further-systems summary{cursor:pointer;font-size:12px;font-weight:600;padding:8px 0}.further-systems .nav-item{font-size:12px;padding-left:8px}

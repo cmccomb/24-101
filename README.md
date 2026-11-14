@@ -1,8 +1,8 @@
 # 24-101 · MechE Systems Lab
 
-[Open the lab](https://cmccomb.com/24-101/) · [Design reference](https://cmccomb.com/24-101/design/) · [Design specification](DESIGN.md) · [CMU 24-101](https://www.meche.engineering.cmu.edu/education/courses/24-101.html)
+[Open the lab](https://cmccomb.com/24-101/) · [Course plan](https://cmccomb.com/24-101/course/) · [Shared system list](COURSE.md) · [Design reference](https://cmccomb.com/24-101/design/) · [Design specification](DESIGN.md) · [CMU 24-101](https://www.meche.engineering.cmu.edu/education/courses/24-101.html)
 
-Fourteen mechanical engineering systems organized around engineering claims, explicit system boundaries, conservation laws, parameter studies and editable design requirements. The 3D printer and laser cutter lead into thermal systems, including a heat pump and refrigerator, and motion systems, including a bicycle drivetrain, CMU Buggy and an illustrative electric race car.
+Fourteen weekly mechanical systems introduce the breadth of CMU MechE through demonstrations, calculation breakdowns and design considerations. Laser cutting comes first, then FDM printing. Wednesday design methods directly support three sequential projects lasting 3, 4 and 7 weeks. [The course plan](COURSE.md) records each system, project deliverable and core-area connection. Prior examples remain available under Further systems.
 
 ## Explore
 
@@ -58,6 +58,9 @@ GitHub Pages deploys the `site/` directory after every push to `main`, following
 
 | File | Purpose |
 | --- | --- |
+| `site/course.js` | Canonical 14-week schedule, 3/4/7 project blocks, teaching notes, coverage and Carnival swap |
+| `site/course/` | Public course plan and core-area coverage map |
+| `site/core-systems.js` | Brakes, elevator, robot, excavator, pump, washer, quadcopter and autoinjector models |
 | `site/systems.js` | Parameters, SI conversions, calculation models, assumptions, prompts and sources |
 | `site/engineering.js` | Lesson claims, boundaries, conservation accounts, requirements and model-applicability checks |
 | `design/tokens.json` | Shared color, typography, spacing, layout and motion tokens |
@@ -80,12 +83,12 @@ Run `npm run tokens` after editing the design tokens. Tests reject CSS or 3D pal
 
 These are transparent teaching models, not validated equipment simulations or full CAD/CFD/FEA models. Animation uses illustrative speed and scale. Calculations use the stated SI conversions. Every system exposes its assumptions and sources. Numerical balance closure verifies accounting, not physical fidelity. Exercise requirements are editable instructional choices, not equipment ratings or safety limits.
 
-The bicycle uses a lossless chain drive and a prescribed cadence. The refrigerator uses a constant cabinet conductance and an assumed fraction of Carnot cooling COP. Laser cutting uses an assumed removal-energy budget. The EV and Buggy inputs are illustrative, not measurements of CMU team vehicles. The three-wheeled Buggy is shown on an exaggerated straight slope, not the actual course.
+The week 3 bicycle model uses a disc-brake torque and a tire-grip bound; a separate drivetrain example retains the lossless chain drive and prescribed cadence. The refrigerator uses a constant cabinet conductance and an assumed fraction of Carnot cooling COP. Laser cutting uses an assumed removal-energy budget. The EV and Buggy inputs are illustrative, not measurements of CMU team vehicles. The three-wheeled Buggy is shown on an exaggerated straight slope, not the actual course.
 
-The Physics section connects to the published 33-141 topics and identifies extensions into Physics II or later engineering courses. Exact lesson timing should be reviewed against the section's syllabus. Buggy is marked for the week before Spring Carnival (week of April 5, 2027); the library order is not a dated weekly schedule.
+The Physics section connects to the published 33-141 topics and identifies extensions into Physics II or later engineering courses. Exact lesson timing should be reviewed against the section's syllabus. Buggy is scheduled for Monday, April 12, 2027, immediately before Spring Carnival, and swaps with autoinjector to week 12. The first Monday is the MLK closure; the laser-cutter session needs a course-specific make-up date. The university calendar does not assign one.
 
 ## Verification
 
-The test suite checks calculation configurations and conservation accounts across all 14 systems, including drivetrain scaling, refrigerator capacity, and EV integration convergence.
+The test suite checks calculation configurations and conservation accounts across the 14 course systems and retained examples. Independent checks cover pump/system intersection, brake work, rope forces, grip force, rotor scaling, spring flow and PD response against a fine-step ODE solver. Schedule checks enforce project lengths, distinct systems, all core areas and the Carnival swap. `node scripts/course-plan.mjs` regenerates the shared repository list; the test suite rejects drift.
 
 WebGL is needed for the 3D view. The text controls, equations and results remain usable if WebGL is unavailable. Animation respects the reduced-motion preference.
